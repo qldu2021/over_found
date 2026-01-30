@@ -1,713 +1,997 @@
-drop table if exists exclude_disall_excd;
-create temporary table exclude_disall_excd (CDML_DISALL_EXCD varchar(3), RULE_ID varchar(20));
+set NOCOUNT on;
+set ANSI_WARNINGS off
+
+set TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+--use ODW
+
+/****************************************************************************************************/
+/* Table of standard exclusions related to appeals													*/
+/****************************************************************************************************/
+if OBJECT_ID('tempdb..#exclude_disall_excd') is not null
+	drop table #exclude_disall_excd;	
+
+create table #exclude_disall_excd (CDML_DISALL_EXCD varchar(3) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, RULE_ID varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL)
 	
-insert into exclude_disall_excd values
-('FA5','line item HMS'),('FA7','line item Connolly'),
-('A01','ProcessedPerAppeal'),('A02','ProcessedPerAppeal'),('A03','ProcessedPerAppeal'),('A04','ProcessedPerAppeal'),('A05','ProcessedPerAppeal'),('A06','ProcessedPerAppeal'),
-('A07','ProcessedPerAppeal'),('A08','ProcessedPerAppeal'),('A09','ProcessedPerAppeal'),('A10','ProcessedPerAppeal'),('A11','ProcessedPerAppeal'),('A12','ProcessedPerAppeal'),
-('A13','ProcessedPerAppeal'),('A14','ProcessedPerAppeal'),('A15','ProcessedPerAppeal'),('A16','ProcessedPerAppeal'),('A17','ProcessedPerAppeal'),('A18','ProcessedPerAppeal'),
-('A19','ProcessedPerAppeal'),('A20','ProcessedPerAppeal'),('A21','ProcessedPerAppeal'),('A22','ProcessedPerAppeal'),('A23','ProcessedPerAppeal'),('A24','ProcessedPerAppeal'),
-('A25','ProcessedPerAppeal'),('A26','ProcessedPerAppeal'),('A27','AddlPaymentOnAppeal'),('A28','AddlPaymentOnAppeal'),('A29','AddlPaymentOnAppeal'),('A30','AddlPaymentOnAppeal'),
-('A31','AddlPaymentOnAppeal'),('A32','AddlPaymentOnAppeal'),('A33','AddlPaymentOnAppeal'),('A34','AddlPaymentOnAppeal'),('A35','AddlPaymentOnAppeal'),('A36','AddlPaymentOnAppeal'),
-('A37','AddlPaymentOnAppeal'),('A38','AddlPaymentOnAppeal'),('A39','AddlPaymentOnAppeal'),('A40','AddlPaymentOnAppeal'),('A41','AddlPaymentOnAppeal'),('A42','AddlPaymentOnAppeal'),
-('A43','AddlPaymentOnAppeal'),('A44','AddlPaymentOnAppeal'),('A45','AddlPaymentOnAppeal'),('A46','AddlPaymentOnAppeal'),('A47','AddlPaymentOnAppeal'),('A48','AddlPaymentOnAppeal'),
-('A49','AddlPaymentOnAppeal'),('A50','AddlPaymentOnAppeal'),('A51','AddlPaymentOnAppeal'),('A52','AddlPaymentOnAppeal'),('A53','AppealDisallowed'),('A54','DenialUpheldOnAppeal'),
-('K01','PaidPerPlanApproval'),('K02','PaidPerPlanApproval'),('K03','PaidPerPlanApproval'),('K04','PaidPerPlanApproval'),('K05','PaidPerPlanApproval'),('K06','PaidPerPlanApproval'),
-('K07','PaidPerPlanApproval'),('K08','PaidPerPlanApproval'),('K09','PaidPerPlanApproval'),('K10','PaidPerPlanApproval'),('K11','PaidPerPlanApproval'),('K12','PaidPerPlanApproval'),
-('K13','PaidPerPlanApproval'),('K14','PaidPerPlanApproval'),('K15','PaidPerPlanApproval'),('K16','PaidPerPlanApproval'),('K17','PaidPerPlanApproval'),('K18','PaidPerPlanApproval'),
-('K19','PaidPerPlanApproval'),('K20','PaidPerPlanApproval'),('K21','PaidPerPlanApproval'),('K22','PaidPerPlanApproval'),('K23','PaidPerPlanApproval'),('K24','PaidPerPlanApproval'),
-('K25','PaidPerPlanApproval'),('A58','72HourEligibility');
+insert into #exclude_disall_excd
+	values			('FA5','line item HMS'),('FA7','line item Connolly'),
+					('A01','ProcessedPerAppeal'),('A02','ProcessedPerAppeal'),('A03','ProcessedPerAppeal'),('A04','ProcessedPerAppeal'),('A05','ProcessedPerAppeal'),('A06','ProcessedPerAppeal'),('A07','ProcessedPerAppeal'),('A08','ProcessedPerAppeal'),('A09','ProcessedPerAppeal'),('A10','ProcessedPerAppeal'),
+					('A11','ProcessedPerAppeal'),('A12','ProcessedPerAppeal'),('A13','ProcessedPerAppeal'),('A14','ProcessedPerAppeal'),('A15','ProcessedPerAppeal'),('A16','ProcessedPerAppeal'),('A17','ProcessedPerAppeal'),('A18','ProcessedPerAppeal'),('A19','ProcessedPerAppeal'),('A20','ProcessedPerAppeal'),
+					('A21','ProcessedPerAppeal'),('A22','ProcessedPerAppeal'),('A23','ProcessedPerAppeal'),('A24','ProcessedPerAppeal'),('A25','ProcessedPerAppeal'),('A26','ProcessedPerAppeal'),('A27','AddlPaymentOnAppeal'),('A28','AddlPaymentOnAppeal'),('A29','AddlPaymentOnAppeal'),('A30','AddlPaymentOnAppeal'),
+					('A31','AddlPaymentOnAppeal'),('A32','AddlPaymentOnAppeal'),('A33','AddlPaymentOnAppeal'),('A34','AddlPaymentOnAppeal'),('A35','AddlPaymentOnAppeal'),('A36','AddlPaymentOnAppeal'),('A37','AddlPaymentOnAppeal'),('A38','AddlPaymentOnAppeal'),('A39','AddlPaymentOnAppeal'),('A40','AddlPaymentOnAppeal'),
+					('A41','AddlPaymentOnAppeal'),('A42','AddlPaymentOnAppeal'),('A43','AddlPaymentOnAppeal'),('A44','AddlPaymentOnAppeal'),('A45','AddlPaymentOnAppeal'),('A46','AddlPaymentOnAppeal'),('A47','AddlPaymentOnAppeal'),('A48','AddlPaymentOnAppeal'),('A49','AddlPaymentOnAppeal'),('A50','AddlPaymentOnAppeal'),
+					('A51','AddlPaymentOnAppeal'),('A52','AddlPaymentOnAppeal'),('A53','AppealDisallowed'),('A54','DenialUpheldOnAppeal'),
+					('K01','PaidPerPlanApproval'),('K02','PaidPerPlanApproval'),('K03','PaidPerPlanApproval'),('K04','PaidPerPlanApproval'),('K05','PaidPerPlanApproval'),('K06','PaidPerPlanApproval'),('K07','PaidPerPlanApproval'),('K08','PaidPerPlanApproval'),('K09','PaidPerPlanApproval'),('K10','PaidPerPlanApproval'),
+					('K11','PaidPerPlanApproval'),('K12','PaidPerPlanApproval'),('K13','PaidPerPlanApproval'),('K14','PaidPerPlanApproval'),('K15','PaidPerPlanApproval'),('K16','PaidPerPlanApproval'),('K17','PaidPerPlanApproval'),('K18','PaidPerPlanApproval'),('K19','PaidPerPlanApproval'),('K20','PaidPerPlanApproval'),
+					('K21','PaidPerPlanApproval'),('K22','PaidPerPlanApproval'),('K23','PaidPerPlanApproval'),('K24','PaidPerPlanApproval'),('K25','PaidPerPlanApproval'),
+					('A58','72HourEligibility');
 
 /****************************************************************************************************/
 /* Table to assign Market Name																		*/
 /****************************************************************************************************/
-drop table if exists markets;
-create temporary table markets (GRGR_CK numeric(10), CSCS_ID_3_2 char(2), MARKET_NAME varchar(12));
+if OBJECT_ID('tempdb..#markets') is not null
+	drop table #markets;	
 
-insert into markets values 
-(1,null,'NJ'), (2,null,'IL'), (3,null,'FL'), (5,null,'MD'), (6,null,'DC'),
-(7,null,'GAAT'), 
-(8,'30','TXSAN-VANT'), (8,'31','TXHOU-VANT'), (8,'32','TXHOU-VANT'), (8,'33','TXHOU-VANT'), (8,'34','TXHOU-VANT'), (8,'44','TXFTW-VANT'),
-(8,'47','TXFTW-VANT'), (8,'61','TXELP-VANT'), (8,'62','TXELP-VANT'), (8,'63','TXLUB-VANT'), (8,'64','TXSAN-VANT'), (8,'03','TXHOU-DSNP'),
-(8,'90','TXSAN-VANT'), (8,'91','TXHOU-VANT'), (8,'92','TXAUS-VANT'), (8,'93','TXBEA-VANT'), (8,'94','TXAUS-VANT'), (8,'95','TXAUS-VANT'),
-(9,null,'NM-VANT'), (10,null,'NM'), (11,null,'NY'),
-(12,null,'MD-VANT'), (13,null,'TN'), (14,null,'SC'), (15,null,'VA'), (16,null,'FL-VANT'),
-(17,null,'TN-VANT'), (18,null,'NY-VANT'), (19,null,'NJ-VANT'), (20,null,'VA-VANT'), (21,null,'NV'),
-(23,null,'TXCOPS'), (24,null,'GA-VANT'), (25,null,'FL-DSNP'), (26,null,'NJ-DSNP'), (28,null,'LA'),
-(4,'01','TXFTW'), (4,'02','TXDAL'), (4,'03','TXHOU'), (4,'04','TXAUS'), (4,'05','TXSAN'), (4,'06','TXCOR'), (4,'07','TXBEA'),
-(4,'08','TXELP'), (4,'09','TXLUB'), (4,'10','TXRSC'), (4,'11','TXRSW'), (4,'12','TXRSN'),
-(27,'04','TXSAN-DSNP'), (27,'07','TXAUS-DSNP'), (27,'08','TXELP-DSNP'), (27,'09','TXLUB-DSNP'),
-(27,'01','TXFTW-DSNP'), (27,'03','TXHOU-DSNP'), (27,'05','TXSAN-DSNP'), (29,null,'WA'), (30,null,'KS'), 
-(31,null,'VAMM'),
-(32,null,'VAAM-DSNP'), (33,null,'WA-VANT'), (34,null,'KY'), (35,null,'SC-BLUE'), (36,null,'CA'),
-(38,null,'WI'),
-(41,null,'NY-WLP-CARE'),(42,null,'CT-WLP-CARE'),(43,null,'NH-WLP-CARE'),(44,null,'ME-WLP-CARE'),
-(45,null,'MO-WLP-CARE'),(46,null,'OH-WLP-CARE'),(47,null,'IN-WLP-CARE'),(48,null,'KY-WLP-CARE'),
-(49,null,'GA-WLP-CARE'),(50,null,'WI-WLP-CARE'),(51,null,'CA-WLP-CARE'),
-(54,null,'IA'),
-(53,null,'CO-WLP-CARE'),
-(88,null,'TXSET'), -- CH0006A
-(37,null,'VA MMP'),(39,null,'CA MMP'),(40,null,'NY FIDA'),(52,null,'TX MMP'),
-(89,null,'WNY'), (90,null,'IN'), -- CH0007C
--- CH0007D BEGIN
-(55,null,'CA MED-SUPP'),(56,null,'CO MED-SUPP'),(57,null,'CT MED-SUPP'),
-(58,null,'GA MED-SUPP'),(59,null,'IN MED-SUPP'),(60,null,'KY MED-SUPP'),
-(61,null,'ME MED-SUPP'),(62,null,'MO MED-SUPP'),(63,null,'NH MED-SUPP'),
-(64,null,'NV MED-SUPP'),(65,null,'NY MED-SUPP'),(66,null,'OH MED-SUPP'),
-(67,null,'VA MED-SUPP'),(68,null,'WI MED-SUPP'),
-(95,null,'AZ MED-SUPP'),(98,null,'TX MED-SUPP'), -- CHM0017			
--- CH0007D END
-(91,null,'GA-EGR'),(92,null,'CA-EGR'), -- CH0008E
-(93, null,'WA'), (102,null,'CO'),(104,null,'MN'),(99,null,'AR'),
-(144,null,'NV-WLP-CARE'), -- CHM0001A
-(133,null,'AZ-WLP-CARE'), -- CHM0001B
-(345,null,'OH'), -- CHM0018
--- CHM0001C BEGIN
-(106,null,'CA-EGR'),(107,null,'CA-EGR'),(119,null,'CA-EGR'),(120,null,'CA-EGR'),(125,null,'CA-EGR'),
-(126,null,'CA-EGR'),(140,null,'CA-EGR'),(117,null,'CO-EGR'),(118,null,'NH-EGR'),(105,null,'NY-EGR'),
-(108,null,'NY-EGR'),(109,null,'NY-EGR'),(110,null,'NY-EGR'),(111,null,'NY-EGR'),(112,null,'NY-EGR'),
-(113,null,'NY-EGR'),(115,null,'NY-EGR'),(116,null,'NY-EGR'),(121,null,'NY-EGR'),(122,null,'NY-EGR'),
-(123,null,'NY-EGR'),(124,null,'NY-EGR'),(127,null,'NY-EGR'),(128,null,'NY-EGR'),(129,null,'NY-EGR'),
-(131,null,'NY-EGR'),(132,null,'NY-EGR'),(135,null,'NY-EGR'),(136,null,'NY-EGR'),(138,null,'NY-EGR'),
-(139,null,'NY-EGR'),(142,null,'NY-EGR'),(143,null,'NY-EGR'),(137,null,'OH-EGR'),-- CHM0001C END
-(212,null,'LA-DSNP'),(234,null,'MO'),(236,null,'NE'), --CHM0008
-(242,null,'IA-DSNP'), -- CHM0009
-(168,null,'NC'),(243,null,'NC-DSNP'), -- CHM0010
-(103,null,'MN MSHO'); -- CHM0011
+create table #markets (GRGR_CK  numeric(10) NOT NULL, CSCS_ID_3_2 char(2) COLLATE SQL_Latin1_General_CP1_CI_AS, MARKET_NAME varchar(12) COLLATE SQL_Latin1_General_CP1_CI_AS)
+	insert into #markets
+		values (1,null,'NJ'), (2,null,'IL'), (3,null,'FL'), (5,null,'MD'), (6,null,'DC'),
+			   (7,null,'GAAT'), 
+			   -- CH03 (8,null,'TXHOU-VANT'), 
+			   (8,'30','TXSAN-VANT'), (8,'31','TXHOU-VANT'), (8,'32','TXHOU-VANT'), (8,'33','TXHOU-VANT'), (8,'34','TXHOU-VANT'), (8,'44','TXFTW-VANT'), -- CH02
+			   (8,'47','TXFTW-VANT'), (8,'61','TXELP-VANT'), (8,'62','TXELP-VANT'), (8,'63','TXLUB-VANT'), (8,'64','TXSAN-VANT'), (8,'03','TXHOU-DSNP'), -- CH02
+			   (8,'90','TXSAN-VANT'), (8,'91','TXHOU-VANT'), (8,'92','TXAUS-VANT'), (8,'93','TXBEA-VANT'), (8,'94','TXAUS-VANT'), (8,'95','TXAUS-VANT'), -- CH14
+			   (8,'43','TXDAL-VANT'), (8,'46','TXLUB-VANT'), (8,'48','TXLUB-VANT'), (8,'49','TXLUB-VANT'), (8,'50','TXLUB-VANT'), (8,'51','TXLUB-VANT'), -- CH27A
+			   (9,null,'NM-VANT'), (10,null,'NM'), (11,null,'NY'),
+			   (12,null,'MD-VANT'), (13,null,'TN'), (14,null,'SC'), (15,null,'VA'), (16,null,'FL-VANT'),
+       		   (17,null,'TN-VANT'), (18,null,'NY-VANT'), (19,null,'NJ-VANT'), (20,null,'VA-VANT'), (21,null,'NV'),
+       		   -- CH06 (22,null,'OH'), 
+       		   (23,null,'TXCOPS'), (24,null,'GA-VANT'), (25,null,'FL-DSNP'), (26,null,'NJ-DSNP'), (28,null,'LA'),
+       		   (4,'01','TXFTW'), (4,'02','TXDAL'), (4,'03','TXHOU'), (4,'04','TXAUS'), (4,'05','TXSAN'), (4,'06','TXCOR'), (4,'07','TXBEA'),
+       		   (4,'08','TXELP'), (4,'09','TXLUB'), (4,'10','TXRSC'), (4,'11','TXRSW'), (4,'12','TXRSN'),
+       		   (27,'04','TXSAN-DSNP'), (27,'07','TXAUS-DSNP'), (27,'08','TXELP-DSNP'), (27,'09','TXLUB-DSNP'), -- CH14
+       		   (27,'01','TXFTW-DSNP'), (27,'03','TXHOU-DSNP'), (27,'05','TXSAN-DSNP'), (29,null,'WA'), (30,null,'KS'), 
+       		   (31,null,'VAMM'), -- CH05
+       		   (32,null,'VAAM-DSNP'), (33,null,'WA-VANT'), (34,null,'KY'), (35,null,'SC-BLUE'), (36,null,'CA'), -- CH07
+       		   -- CH30 CHANGED TO BELOW (37,null,'VAAM-DUAL'), (38,null,'WI'), (39,null, 'CA-DUAL'), -- CH10
+			   (38,null,'WI'),(37,null,'VA MMP'),(39,null,'CA MMP'),(40,null,'NY FIDA'),(52,null,'TX MMP'), -- CH30 CHANGED FROM ABOVE
+       		   (41,null,'NY-WLP-CARE'),(42,null,'CT-WLP-CARE'),(43,null,'NH-WLP-CARE'),(44,null,'ME-WLP-CARE'), -- CH14
+       		   (45,null,'MO-WLP-CARE'),(46,null,'OH-WLP-CARE'),(47,null,'IN-WLP-CARE'),(48,null,'KY-WLP-CARE'), -- CH14
+       		   (49,null,'GA-WLP-CARE'),(50,null,'WI-WLP-CARE'),(51,null,'CA-WLP-CARE'), -- CH14
+       		   (54,null,'IA'), -- CH26
+       		   (53,null,'CO-WLP-CARE'), -- CH27
+       		   (212,null,'LA-DSNP'),(234,null,'MO'),(236,null,'NE'), --CHM0008
+       		   (88,null,'TXSET'), -- CH0006A
+			   (89,null,'WNY'), (90,null,'IN'), -- CH0007C
+								-- CH0007D BEGIN
+			   (55,null,'CA MED-SUPP'),(56,null,'CO MED-SUPP'),(57,null,'CT MED-SUPP'),
+			   (58,null,'GA MED-SUPP'),(59,null,'IN MED-SUPP'),(60,null,'KY MED-SUPP'),
+			   (61,null,'ME MED-SUPP'),(62,null,'MO MED-SUPP'),(63,null,'NH MED-SUPP'),
+			   (64,null,'NV MED-SUPP'),(65,null,'NY MED-SUPP'),(66,null,'OH MED-SUPP'),
+			   (67,null,'VA MED-SUPP'),(68,null,'WI MED-SUPP'),
+			   (95,null,'AZ MED-SUPP'),(98,null,'TX MED-SUPP'), -- CHM0017
+						-- CH0007D END
+						(345,null,'OH'), -- CHM0018 
+			   (168,null,'NC'),(243,null,'NC-DSNP'), -- CHM0010
+				(242,null,'IA-DSNP'), --CHM0009 IA DNSP
+				(103,null,'MN MSHO'), -- CHM0011
+			   (91,null,'GA-EGR'),(92,null,'CA-EGR'), -- CH0008E
+			   (102,null,'CO');
 
 -- CHM0012 BEGIN
-delete from markets
-where grgr_ck in (8,27);
 
-insert into markets values 
-(8,null,'TX-VANT'),(27,null,'TX-DSNP');
+	delete
+	  from #markets
+	 where grgr_ck in (8,27);
+	 insert into #markets values ( 8,null,'TX-VANT');
+	 insert into #markets values (27,null,'TX-DSNP');
+
 -- CHM0012 END
 
 -- CHM0003a BEGIN
-insert into markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
-select ex.GRGR_CK, null as CSCS_ID_3_2, concat(substring(ex.GRGR_ID,1,2),'-EGR')
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_GRGR_GROUP_CMPCT_ACTV ex
-where substring(ex.GRGR_ID,3,3) = 'EGR'
-  and not exists (select 'x' from markets m where ex.grgr_ck = m.grgr_ck);						 					 
+INSERT INTO #markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
+select EX.GRGR_CK, NULL AS CSCS_ID_3_2, SUBSTRING(GRGR_ID,1,2)+'-EGR' AS MARKET_NAME
+						 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+						-- WHERE EX.GRGR_ID = 'FLCMP000'
+						where substring(GRGR_ID,3,3) = 'EGR'
+--					     and substring(GRGR_ID,1,2) <> 'PA' -- CHM0013  --8298 Removed
+						 and not exists (select 'x' from #markets m where ex.grgr_ck = m.grgr_ck);						 					 
 -- CHM0003a END
 
 -- CHM0014 BEGIN
-insert into markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
-select ex.GRGR_CK, null as CSCS_ID_3_2, concat(substring(GRGR_ID,1,2),'-GRS') as MARKET_NAME
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_GRGR_GROUP_CMPCT_ACTV ex
-where GRGR_ID like '%GRS%'
-and not exists (select 'x' from markets m where ex.grgr_ck = m.grgr_ck);
+INSERT INTO #markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
+select EX.GRGR_CK, NULL AS CSCS_ID_3_2, SUBSTRING(GRGR_ID,1,2)+'-GRS' AS MARKET_NAME
+						 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+						-- WHERE EX.GRGR_ID = 'FLCMP000'
+						where GRGR_ID LIKE '%GRS%'
+--						 and substring(GRGR_ID,1,2) <> 'PA' -- CH30 --8298 Removed
+						 and not exists (select 'x' from #markets m where ex.grgr_ck = m.grgr_ck);
 -- CHM0014 END
+
+--CHM0015 BEGIN
+INSERT INTO #markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
+select EX.GRGR_CK, NULL AS CSCS_ID_3_2, 'NV MED-SUPP' AS MARKET_NAME
+                                         FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+                                         WHERE EX.GRGR_CK = 64
+                                         and not exists (select 'x' from #markets m where ex.grgr_ck = m.grgr_ck);
+
+INSERT INTO #markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
+select EX.GRGR_CK, NULL AS CSCS_ID_3_2, 'NV-WLP-CARE' AS MARKET_NAME
+                                         FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+                                         WHERE EX.GRGR_CK = 144
+                                         and not exists (select 'x' from #markets m where ex.grgr_ck = m.grgr_ck);
+
+INSERT INTO #markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
+select EX.GRGR_CK, NULL AS CSCS_ID_3_2, 'MO-WLP-CARE' AS MARKET_NAME
+                                         FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+                                         WHERE EX.GRGR_CK = 45
+                                         and not exists (select 'x' from #markets m where ex.grgr_ck = m.grgr_ck);
+
+INSERT INTO #markets (GRGR_CK, CSCS_ID_3_2, MARKET_NAME)
+select EX.GRGR_CK, NULL AS CSCS_ID_3_2, 'MO MED-SUPP' AS MARKET_NAME
+                                         FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+                                         WHERE EX.GRGR_CK = 62
+                                         and not exists (select 'x' from #markets m where ex.grgr_ck = m.grgr_ck);
+
+--CHM0015 END 
+						 
+
+delete from #markets where MARKET_NAME like '%MED-SUPP'; -- CHM0016
 
 /****************************************************************************************************/
 /* Table of SNP Markets																				*/
 /****************************************************************************************************/
-drop table if exists markets_vant;
-create temporary table markets_vant (GRGR_CK numeric(10));
-
-insert into markets_vant (GRGR_CK)
-select distinct GRGR_CK
-from markets 
-where MARKET_NAME like '%SNP' 
-   or MARKET_NAME like '%VANT'
-   or MARKET_NAME like '%MED-SUPP' -- CH0007D
+if OBJECT_ID('tempdb..#markets_vant') is not null
+	drop table #markets_vant;   	
+	
+select distinct GRGR_CK into #markets_vant from #markets where MARKET_NAME like '%SNP' or MARKET_NAME like '%VANT'
+   --or MARKET_NAME like '%MED-SUPP' -- CH0007D
    or MARKET_NAME like '%EGR'	  -- CH0008E
    or MARKET_NAME like '%GRS' -- CHM0014
-   or MARKET_NAME like '%CARE'
+   or MARKET_NAME like '%CARE'	  -- CH14
    or MARKET_NAME like '%MMP'
    or MARKET_NAME like '%FIDA';
 
-drop table if exists markets_msupp;
-create temporary table markets_msupp (GRGR_CK numeric(10));
+if OBJECT_ID('tempdb..#markets_included') is not null
+	drop table #markets_included;   	
+	
+create table #markets_included (GRGR_CK  numeric(10) NOT NULL)
+ insert into #markets_included
+	select distinct grgr_ck from #markets
+	where (grgr_ck in (select grgr.GRGR_CK from dw.fac_cmc_grgr_group grgr with (nolock) where grgr.GRGR_MCTR_TYPE = 'MDCR')
+		and not (MARKET_NAME like '%MED-SUPP')
+		or (grgr_ck in (37,39,52))); -- CH30 
+       --where --((exists (select 'x' from #markets_vant mv where #markets.grgr_ck = mv.grgr_ck))
 
-insert into markets_msupp (GRGR_CK)
-select distinct GRGR_CK 
-from markets 
-where MARKET_NAME like '%MED-SUPP';
-
-DROP table if exists markets_included;
-CREATE temporary table markets_included (GRGR_CK numeric(10));
-
-insert into markets_included (GRGR_CK)
-select distinct grgr_ck 
-from markets  
-where GRGR_CK not in (14,15,20,22,10,12,2,35,36) -- CH0000C ADDED NM(10) -- CH0007B ADDED 12
-  and not exists (select 'x' from markets_vant mv where markets.GRGR_CK = mv.GRGR_CK); -- CHM0016
+create index mi_idx1 on #markets_included (GRGR_CK);
 
 -- CH0006B BEGIN       		   
-drop table if exists mktexp_rtbl;
-create temporary table mktexp_rtbl (GRGR_CK numeric(10), MONTHS_TO_EXPIRE int, EXPIRATION_ID int, EXPTYPE varchar(4));
+if OBJECT_ID('tempdb..#mktexp_rtbl') is not null
+	drop table #mktexp_rtbl;	
 
-insert into mktexp_rtbl (GRGR_CK,EXPIRATION_ID) 
-values 
-(36,129),(39,161),(51,131),(53,133),(42,135),(3,28),(3,6),(25,27),(16,27),(24,137),(49,137),
-(7,5973), --CHM0019 (7,8),
-(54,3888),(47,139),
+create table #mktexp_rtbl (GRGR_CK  numeric(10),
+						   MONTHS_TO_EXPIRE int, EXPIRATION_ID int,
+						   EXPTYPE varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS
+						   );
+
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (36,129);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (39,161);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (51,131);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (53,133);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (42,135);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (3,28);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (3,6);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (25,27);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (16,27);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (24,137);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (49,137);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (7,5973); --CHM0019
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (54,3888);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (47,139);
 -- CH0008A BEGIN
-(67,3907), -- VA MED-SUPP
-(67,3908), -- VA MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (67,3907); -- VA MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (67,3908); -- VA MED-SUPP
 -- CH0008A END
-(6,4110), -- DC -- CH0008D
--- CH0008A insert into mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (30,10);
-(30,4083), -- CH0008A
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (6,4110); -- DC -- CH0008D
+-- CH0008A insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (30,10);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (30,4083); -- CH0008A
 -- CH0008E BEGIN
-(91,27),(92,27),
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (91,27);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (92,27);
 -- CH0008E END
-(34,34),(48,141),
-(28,4357), --CHM0019 (28,3640),
-(5,13),(12,27),(44,143),(45,145),(43,147),(1,17),(26,27),(19,27),(9,165),(21,3643),(11,21),(40,162),
-(18,149),(41,149),(46,151),(13,24),(17,27),(52,163),(4,5),(27,153),(8,153),(23,5),(37,164),(32,155),(31,25),(29,26),(33,157),
-(38,130),(50,159),
-(88,5), -- CH0006A
-(89,21),   -- CH0007C
--- (90,3955), -- CH0007C
-(90,4356),    -- CHM0022a
--- CH0007D BEGIN
-(55,3915), -- CA MED-SUPP
-(56,3916), -- CO MED-SUPP
-(57,3904), -- CT MED-SUPP
-(58,3906), -- GA MED-SUPP
-(59,3912), -- IN MED-SUPP
-(60,3911), -- KY MED-SUPP
-(61,3902), -- ME MED-SUPP
-(62,3913), -- MO MED-SUPP
-(63,3903), -- NH MED-SUPP
-(64,3917), -- NV MED-SUPP
-(65,3905), -- NY MED-SUPP
-(66,3910), -- OH MED-SUPP
-(68,3914), -- WI MED-SUPP
--- CH0007D END
-(93,26),
-(102,4370), --CHM0019,(102,4327),
-(104,4330),(99,4329),
-(144,27), -- CHM0001A
-(133,27), -- CHM0001B
--- CHM0001C BEGIN
-(106,27),(107,27),(119,27),(120,27),(125,27),(126,27),(140,27),(117,27),(118,27),(105,27),(108,27),(109,27),(110,27),(111,27),(112,27),
-(113,27),(115,27),(116,27),(121,27),(122,27),(123,27),(124,27),(127,27),(128,27),(129,27),(131,27),(132,27),(135,27),(136,27),(138,27),
-(139,27),(142,27),(143,27),(137,27),
--- CHM0001C END
-(212,27),--CHM0008
-(345,22), -- CHM0018 
-(234,4354),--CHM0008
-(236,4355),--CHM0008
-(28,4353),--CHM0007
-(242,27), -- CHM0009
-(168,4364),-- CHM0010
-(243,27),-- CHM0010
-(103,4330), -- CHM0011
-(95,4225),(98,3919); -- CHM0017
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (34,34);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (48,141);
+-- insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (28,3640); --CHM0019
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (5,13);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (12,27);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (44,143);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (45,145);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (43,147);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (1,17);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (26,27);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (19,27);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (9,165);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (21,3643);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (11,21);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (40,162);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (18,149);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (41,149);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (46,151);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (13,24);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (17,27);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (52,163);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (4,5);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (27,153);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (8,153);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (23,5);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (37,164);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (32,155);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (31,25);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (29,26);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (33,157);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (38,130);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (50,159);
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (88,5); -- CH0006A
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (89,21);   -- CH0007C
+-- insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (90,3955); -- CH0007C  --CHM0022a
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (90,4356);    --CHM0022a
 
+-- CH0007D BEGIN
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (55,3915); -- CA MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (56,3916); -- CO MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (57,3904); -- CT MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (58,3906); -- GA MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (59,3912); -- IN MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (60,3911); -- KY MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (61,3902); -- ME MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (62,3913); -- MO MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (63,3903); -- NH MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (64,3917); -- NV MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (65,3905); -- NY MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (66,3910); -- OH MED-SUPP
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (68,3914); -- WI MED-SUPP
+-- CH0007D END
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (102,4370); --CHM0019
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (212,27);--CHM0008
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (345,22); -- CHM0018 
+
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (234,4354);--CHM0008
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (236,4355);--CHM0008
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (28,4357); --CHM0019
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (242,27); -- CHM0009
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (168,4364);-- CHM0010
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (243,27);-- CHM0010
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (103,4330); -- CHM0011
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (95,4225); -- CHM0017
+insert into #mktexp_rtbl (GRGR_CK,EXPIRATION_ID) values (98,3919); -- CHM0017
+			   
 -- CHM0003a BEGIN
-insert into mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
+INSERT INTO #mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
    select EX.GRGR_CK, 27
-	 from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_GRGR_GROUP_CMPCT_ACTV ex
+	 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
 	where substring(GRGR_ID,3,3) = 'EGR'
-	 and not exists (select 'x' from mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
--- CHM0003a END
+	 and not exists (select 'x' from #mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
+-- CHM0003a END	
 
 -- CHM0014 BEGIN
-insert into mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
+INSERT INTO #mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
    select EX.GRGR_CK, 27
-	 from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_GRGR_GROUP_CMPCT_ACTV ex
+	 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
 	where GRGR_ID like '%GRS%'
-	 and not exists (select 'x' from mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
+	 and not exists (select 'x' from #mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
 -- CHM0014 END	
 
-update mktexp_rtbl as mr
-set MONTHS_TO_EXPIRE = c.MONTHS_TO_EXPIRE,
-	EXPTYPE = c.EXPTYPE
-from (select distinct cer.EXPIRATION_DESC, cer.MONTHS_TO_EXPIRE*-1 as MONTHS_TO_EXPIRE, cer.EXPIRATION_ID--, cerd.COLUMN_NAME
-		, case when UPPER(cer.MONTHSTOEXPIRE_SQL) like '%PAID%' then 'PAID'  --CHM0021a
- 			   when UPPER(cer.MONTHSTOEXPIRE_SQL) like '%SVC%' then 'DOS'    --CHM0021a
-			   when UPPER(cer.MONTHSTOEXPIRE_SQL) like '%RECD%' then 'RECD'  --CHM0021a
-			  else 'UNK' end as EXPTYPE
-		 from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CCU_EXPIRATION_RULE_DETAIL_CMPCT cerd
-		 	inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CCU_EXPIRATION_RULE_CMPCT cer on cer.EXPIRATION_ID = cerd.EXPIRATION_ID
-		where ((cer.EXPIRATION_ID = 27)
-		    or (cerd.COLUMN_NAME in ('MARKET')))
+--CHM0015 BEGIN
+INSERT INTO #mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
+   select EX.GRGR_CK, 27
+	 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+	where EX.GRGR_CK = 144
+	 and not exists (select 'x' from #mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
+
+INSERT INTO #mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
+   select EX.GRGR_CK, 3917
+	 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+	where EX.GRGR_CK = 64
+	 and not exists (select 'x' from #mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
+
+INSERT INTO #mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
+   select EX.GRGR_CK, 145
+	 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+	where EX.GRGR_CK = 45
+	 and not exists (select 'x' from #mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
+
+INSERT INTO #mktexp_rtbl (GRGR_CK,EXPIRATION_ID)
+   select EX.GRGR_CK, 3913
+	 FROM odw.DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK)
+	where EX.GRGR_CK = 62
+	 and not exists (select 'x' from #mktexp_rtbl m where ex.grgr_ck = m.grgr_ck);
+--CHM0015 END		
+		
+  
+ with c as
+   (	
+		SELECT distinct cer.EXPIRATION_DESC, cer.MONTHS_TO_EXPIRE*-1 as MONTHS_TO_EXPIRE, cer.EXPIRATION_ID--, CERD.COLUMN_NAME
+		, case when UPPER(cer.MONTHSTOEXPIRE_SQL) like '%PAID%' THEN 'PAID'  --CHM0021a UPPER
+ 			   when UPPER(cer.MONTHSTOEXPIRE_SQL) like '%SVC%' THEN 'DOS'    --CHM0021a UPPER
+			   when UPPER(cer.MONTHSTOEXPIRE_SQL) like '%RECD%' THEN 'RECD'  --CHM0021a UPPER
+			  else 'UNK' end AS EXPTYPE
+		 FROM ccert.dbo.CCU_EXPIRATION_RULE_DETAIL  CERD (NOLOCK) 
+		 INNER JOIN ccert.dbo.CCU_EXPIRATION_RULE CER (NOLOCK)  ON CER.EXPIRATION_ID=CERD.EXPIRATION_ID
+		Where  ((cer.EXPIRATION_ID = 27)
+		or (CERD.COLUMN_NAME IN ('MARKET')))
 		and cer.MONTHS_TO_EXPIRE is not null
-		and UPPER(cer.EXPIRATION_DESC) not like '%OHI %'		 --CHM0021a
-		and UPPER(cer.EXPIRATION_DESC) not like '%RETRO%') as c	 --CHM0021a
-where mr.EXPIRATION_ID = c.EXPIRATION_ID;
+		and UPPER(cer.EXPIRATION_DESC) not like '%OHI %'   --CHM0021a UPPER
+		and UPPER(cer.EXPIRATION_DESC) not like '%RETRO%'  --CHM0021a UPPER
+   )
+     update #mktexp_rtbl
+        set MONTHS_TO_EXPIRE = c.MONTHS_TO_EXPIRE,
+            EXPTYPE          = c.EXPTYPE
+       from c
+      where c.EXPIRATION_ID = #mktexp_rtbl.EXPIRATION_ID;
+
+
 -- CH0006B END
 
-set		ScheduleDay			= 13;
-set		QueryRunTime		= current_date();
-set		ReportStartDate		= dateadd(day,$ScheduleDay-2,dateadd(day,1,last_day(dateadd(month,-4,$QueryRunTime),month))); /*CH02 */
-set		ReportEndDate		= dateadd(day,$ScheduleDay-3,dateadd(day,1,last_day(dateadd(month,-1,$QueryRunTime),month)));
+/* CH04 BEGIN
+if OBJECT_ID('tempdb..#fl_recov_excptns_phy') is not null
+	drop table #fl_recov_excptns_phy;	
+	
+create table #fl_recov_excptns_phy (PRCF_MCTR_SPEC varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS not null);
 
-set		PicmId		= 'B7359';
-set		LeadId		= '6173';
+insert into #fl_recov_excptns_phy values
+('S001'),('S002'),('S005'),('S006'),('S009'),('S010'),('S011'),('S014'),('S015'),('S016'),('S017'),('S018'),('S019'),('S020'),('S022'),('S025'),('S026'),('S029'),('S030'),('S034'),
+('S038'),('S040'),('S042'),('S043'),('S044'),('S048'),('S049'),('S051'),('S052'),('S053'),('S054'),('S055'),('S056'),('S057'),('S058'),('S060'),('S061'),('S072'),('S073'),('S076'),
+('S079'),('S080'),('S081'),('S083'),('S085'),('S086'),('S088'),('S089'),('S090'),('S091'),('S092'),('S093'),('S094'),('S095'),('S096'),('S100'),('S101'),('S102'),('S103'),('S104'),
+('S106'),('S107'),('S108'),('S113'),('S114'),('S117'),('S118'),('S119'),('S120'),('S121'),('S122'),('S123'),('S124'),('S125'),('S126'),('S127'),('S128'),('S129'),('S130'),('S131'),
+('S132'),('S133'),('S134'),('S135'),('S136'),('S137'),('S138'),('S139'),('S140'),('S141'),('S142'),('S146'),('S147'),('S149'),('S150'),('S152'),('S154'),('S155'),('S156'),('S157'),
+('S158'),('S159'),('S160'),('S161'),('S162'),('S164'),('S167'),('S170'),('S171'),('S172'),('S175'),('S177'),('S179'),('S181'),('S182'),('S183'),('S184'),('S185'),('S186'),('S187'),
+('S188'),('S189'),('S190'),('S191'),('S192'),('S193'),('S194'),('S195'),('S196'),('S197'),('S199'),('S203'),('S204'),('S210'),('S220'),('S221'),('S222'),('S223'),('S224'),('S225'),
+('S226'),('S227'),('S228'),('S229'),('S230'),('S231'),('S232'),('S233'),('S234'),('S239'),('S243'),('S244'),('S245'),('S246'),('S247'),('S248'),('S249'),('S250'),('S251'),('S256'),
+('S257'),('S258'),('S259'),('S260'),('S261'),('S262'),('S263'),('S264'),('S265'),('S266'),('S267'),('S268'),('S269'),('S278'),('S279'),('S289'),('S290'),('S294'),('S296'),('S297'),
+('S321'),('S322'),('S323'),('S324'),('S331'),('S392'),('S397'),('S398'),('S418'),('S419'),('S422'),('S423'),('S424'),('S425'),('S426'),('S427'),('S428'),('S430'),('S441'),('S450'),
+('S458'),('S466'); -- CH02
+
+alter table #fl_recov_excptns_phy add primary key (PRCF_MCTR_SPEC);
+
+if OBJECT_ID('tempdb..#fl_recov_excptns_clnc') is not null
+	drop table #fl_recov_excptns_clnc;	
+	
+create table #fl_recov_excptns_clnc (PRPR_MCTR_TYPE varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS not null);
+
+insert into #fl_recov_excptns_clnc values
+('S012'),('S033'),('S037'),('S041'),('S045'),('S050'),('S099'),('S105'),('S148'),('S151'),('S176'),('S178'),('S207'),('S208'),('S209'),('S235'),('S236'),('S237'),('S241'),('S293'),
+('S326'),('S327'),('S328'),('S329'),('S330'),('S332'),('S333'),('S334'),('S335'),('S336'),('S337'),('S338'),('S339'),('S340'),('S341'),('S342'),('S343'),('S348'),('S349'),('S350'),
+('S351'),('S352'),('S353'),('S354'),('S355'),('S356'),('S357'),('S358'),('S359'),('S360'),('S361'),('S368'),('S369'),('S370'),('S371'),('S372'),('S373'),('S374'),('S375'),('S376'),
+('S377'),('S382'),('S383'),('S385'),('S386'),('S387'),('S390'),('S391'),('S403'),('S404'),('S405'),('S406'),('S407'),('S408'),('S409'),('S410'),('S411'),('S412'),('S413'),('S414'),
+('S415'),('S416'),('S417'),('S420'),('S421'),
+('S459'),('S460'),('S461'); -- CH02
+
+alter table #fl_recov_excptns_clnc add primary key (PRPR_MCTR_TYPE);
+ CH04 END */
 
 
+declare @QueryRunTime			datetime,
+		@ReportStartDate		datetime,
+		@ReportEndDate			datetime,
+		@ActivityId				varchar(30),
+		@GAMarketDOS			datetime, 
 
-drop table if exists meme_tbl;
-create temporary table meme_tbl (GRGR_CK numeric(10), MEME_CK numeric(10));
+-- CHM0006 BEGIN
+		@ScheduleDay			int,
+		@CutOffDate				datetime;
 
-	insert into meme_tbl (GRGR_CK, MEME_CK)
-		select distinct clcl.GRGR_CK, clcl.MEME_CK
-		from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl
-			inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CDML_CL_LINE_CMPCT_ACTV cdml on clcl.CLCL_ID = cdml.CLCL_ID											
-		where clcl.GRGR_CK = 1 
-		  and clcl.CLCL_PAID_DT between $ReportStartDate and $ReportEndDate
-		  and clcl.CLCL_CUR_STS = '02'
-		  and cdml.CDML_CUR_STS = '02'
-		  and cdml.IPCD_ID like 'S5102%'
-		  and cdml.CDML_PR_PYMT_AMT > 0;
+Set		@ScheduleDay			= 7; -- CH32 17;
+Set		@CutOffDate				= '2020-11-30'; -- this is the interim month/quarter; the new schedule will apply after this date; date may varry for each report;
+-- CH02
 
-drop table if exists drv_tbl;
-create temporary table drv_tbl (GRGR_CK numeric(10,0), MEME_CK numeric(10,0), CLCL_RECD_DT date, 
-								CLCL_ID char(12), CDML_SEQ_NO numeric(5,0), CDML_FROM_DT date,
-								CLCL_PAID_DT date, GROUP_ID int, RECORD_TYPE char(1));	
+Set		@QueryRunTime			= getdate();
+Set		@ReportStartDate		=(select 		case	
+					when @CutOffDate<@queryRuntime then dateadd(day, @ScheduleDay-2,dateadd(day,1,eomonth(@QueryRunTime,-2))) -- report start date for future months schedule
+					when @CutOffDate>=@queryRuntime then dateadd(mm, DATEDIFF(mm,0,DATEADD(mm,-1,@QueryRunTime)), 0) -- report start date for interim month schedule
+				end);
+Set		@ReportEndDate			= dateadd(day, @ScheduleDay-3,dateadd(day,1,eomonth(@QueryRunTime,-1))); 
+--CHM0006 END
+ 
+Set		@GAMarketDOS			= CAST(DATEADD(MONTH,-12,GETDATE()) AS DATE); -- CH02
 
-	insert into drv_tbl (GRGR_CK, MEME_CK, CLCL_RECD_DT, CLCL_ID, CDML_SEQ_NO, CDML_FROM_DT, CLCL_PAID_DT)
-		select clcl.GRGR_CK, clcl.MEME_CK, clcl.CLCL_RECD_DT, clcl.CLCL_ID, cdml.CDML_SEQ_NO, cdml.CDML_FROM_DT, clcl.CLCL_PAID_DT
-		from meme_tbl mt
-			inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl on mt.GRGR_CK = clcl.GRGR_CK
-																				   and mt.MEME_CK = clcl.MEME_CK
-			inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CDML_CL_LINE_CMPCT_ACTV cdml on clcl.CLCL_ID = cdml.CLCL_ID
-		where clcl.GRGR_CK = 1 
-		  and clcl.CLCL_CUR_STS = '02'
-		  and cdml.CDML_CUR_STS  = '02'
-		  and cdml.IPCD_ID like 'S5102%'
-		  and cdml.CDML_PR_PYMT_AMT > 0;
-	 
-/****************************************************************************************************/
-/* Remove duplicate records, if exist																*/
-/****************************************************************************************************/
-create or replace temporary table drv_tbl as 
-select * from drv_tbl
-qualify row_number() over (partition by CLCL_ID, CDML_SEQ_NO order by 1) = 1;
+Set		@ActivityId = 'pia_4883';
 
-UPDATE DRV_TBL AS dt
-	SET dt.GROUP_ID = dtg.GROUP_ID
-	FROM (SELECT dt1.GRGR_CK, dt1.MEME_CK, dt1.CDML_FROM_DT,
-			DENSE_RANK() OVER
-				(ORDER BY dt1.GRGR_CK, dt1.MEME_CK, dt1.CDML_FROM_DT) AS GROUP_ID
-			FROM DRV_TBL dt1) AS dtg 
-where dt.GRGR_CK = dtg.GRGR_CK AND 
-	  dt.MEME_CK = dtg.MEME_CK AND 
-	  dt.CDML_FROM_DT = dtg.CDML_FROM_DT;
 
-DELETE FROM DRV_TBL WHERE GROUP_ID IN (SELECT dt.GROUP_ID FROM DRV_TBL AS dt GROUP BY dt.GROUP_ID HAVING COUNT(dt.GROUP_ID)<2);
-	 
-drop table if exists ROW_TBL;
-create temporary table ROW_TBL (CLCL_RECD_DT date, CLCL_ID char(12), CDML_SEQ_NO numeric(5,0), 
-								GROUP_ID int, GROUP_ROW_NUMBER int);	
-							
---assign ref vs ovp
-INSERT INTO ROW_TBL (CLCL_RECD_DT, CLCL_ID, CDML_SEQ_NO, GROUP_ID, GROUP_ROW_NUMBER)
-SELECT dt.CLCL_RECD_DT, dt.CLCL_ID, dt.CDML_SEQ_NO, dt.GROUP_ID, (DENSE_RANK() OVER (PARTITION BY dt.GROUP_ID ORDER BY dt.CLCL_RECD_DT, dt.CLCL_ID, dt.CDML_SEQ_NO))
-FROM DRV_TBL AS dt;
+ if OBJECT_ID('tempdb..#drv_tbl') is not null
+	drop table #drv_tbl;	
 
-UPDATE DRV_TBL AS DT
-	SET DT.RECORD_TYPE = 'R'
-	FROM ROW_TBL AS RT
-	WHERE DT.GROUP_ID = RT.GROUP_ID AND 
-		  DT.CLCL_ID = RT.CLCL_ID AND 
-	  	  DT.CDML_SEQ_NO = RT.CDML_SEQ_NO AND 
-	  	  RT.GROUP_ROW_NUMBER = 1;
-					
-UPDATE DRV_TBL AS DT
-	SET DT.RECORD_TYPE = 'O'
-	FROM ROW_TBL AS RT
-	WHERE DT.GROUP_ID = RT.GROUP_ID AND 
-		  DT.CLCL_ID = RT.CLCL_ID AND 
-	  	  DT.CDML_SEQ_NO = RT.CDML_SEQ_NO AND 
-	  	  RT.GROUP_ROW_NUMBER > 1;
-					
-DROP TABLE ROW_TBL;
+create table #drv_tbl (GRGR_CK numeric(10,0), CLCL_ID char(12) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, CDML_SEQ_NO numeric(5,0) NOT NULL,
+					   MEME_CK numeric(10,0) NOT NULL, PRPR_ID char(12) COLLATE SQL_Latin1_General_CP1_CI_AS, CDML_FROM_DT datetime NOT NULL, 
+					   ROOT_IPCD_ID varchar(5) COLLATE SQL_Latin1_General_CP1_CI_AS, GROUP_ID int, RECORD_TYPE char(1) COLLATE SQL_Latin1_General_CP1_CI_AS);
 
-delete from drv_tbl as d					  
-where not exists (select 'x'
-			    	from drv_tbl dt
-				   where d.GROUP_ID = dt.GROUP_ID
-				     and (dt.CLCL_PAID_DT between $ReportStartDate and $ReportEndDate
-					   or d.CLCL_PAID_DT between $ReportStartDate and $ReportEndDate));
+	insert into #drv_tbl (GRGR_CK, CLCL_ID, CDML_SEQ_NO, MEME_CK, PRPR_ID, CDML_FROM_DT, ROOT_IPCD_ID, RECORD_TYPE)
+		select clcl.GRGR_CK, clcl.CLCL_ID, cdml.CDML_SEQ_NO, cdml.MEME_CK, cdml.PRPR_ID, cdml.CDML_FROM_DT, cdml.ROOT_IPCD_ID, 'O'	
+		from #markets_included mi
+            inner join dw.FAC_CMC_CDML_CL_LINE cdml with (nolock) on mi.GRGR_CK = cdml.GRGR_CK 
+			inner join dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) on cdml.clcl_id = clcl.clcl_id
+			--CH34 inner join dw.FAC_CMC_PRPR_PROV prpr with (nolock) on cdml.PRPR_ID = prpr.PRPR_ID and
+			--CH34													  prpr.PRPR_ENTITY = 'P'
+		where cdml.CDML_CUR_STS = '02'
+		  and clcl.CLCL_PAID_DT between @ReportStartDate and @ReportEndDate
+		  -- CH33 MOVED BELOW and cdml.IPCD_ID like 'J%' -- CH32
+		  and cdml.CDML_PR_PYMT_AMT > 0
+		  and (((cdml.IPCD_ID like 'J%') AND (cdml.ROOT_IPCD_ID between 'J0100' and 'J9999')) -- CH33 MOVED LIKE J% DOWN HERE
+		     -- CH33 BEGIN
+			  OR (cdml.IPCD_ID LIKE 'Q%')  -- CH33 END
+			  OR (cdml.ROOT_IPCD_ID in ('90375','90376','90378','P9047','C9257')) --CH36 --CH37
+			  )
+			
+		  and ((cdml.IPCD_ID LIKE '_____JW') or (cdml.CDML_IPCD_MOD2 = 'JW') or (cdml.CDML_IPCD_MOD3 = 'JW') or (cdml.CDML_IPCD_MOD4 = 'JW'))
+		;
 
-DELETE FROM DRV_TBL
-WHERE ifnull(DRV_TBL.RECORD_TYPE,'R') = 'R'
-AND NOT EXISTS (SELECT 'x'
-	FROM DRV_TBL AS DT
-	WHERE DRV_TBL.GROUP_ID = DT.GROUP_ID
-		AND DT.RECORD_TYPE = 'O'
+--CH31 BEGIN
+	insert into #drv_tbl (GRGR_CK, CLCL_ID, CDML_SEQ_NO, MEME_CK, PRPR_ID, CDML_FROM_DT, ROOT_IPCD_ID, RECORD_TYPE)
+		select clcl.GRGR_CK, clcl.CLCL_ID, cdml.CDML_SEQ_NO, cdml.MEME_CK, cdml.PRPR_ID, cdml.CDML_FROM_DT, cdml.ROOT_IPCD_ID, 'O'	
+		from #markets_included mi
+            inner join dw.FAC_CMC_CDML_CL_LINE cdml with (nolock) on mi.GRGR_CK = cdml.GRGR_CK 
+			inner join dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) on cdml.clcl_id = clcl.clcl_id
+			inner join dw.FAC_CMC_CLHP_HOSP clhp with (nolock) on cdml.CLCL_ID = clhp.CLCL_ID
+		where cdml.CDML_CUR_STS = '02'
+		  and clcl.CLCL_PAID_DT between @ReportStartDate and @ReportEndDate
+		  -- CH33 MOVED BELOW and cdml.IPCD_ID like 'J%' -- CH32
+		  and cdml.CDML_PR_PYMT_AMT > 0
+		  and (((cdml.IPCD_ID like 'J%') AND (cdml.ROOT_IPCD_ID between 'J0100' and 'J9999')) -- CH33 MOVED LIKE J% DOWN HERE
+		     -- CH33 BEGIN
+			  OR   (cdml.IPCD_ID LIKE 'Q%') -- CH33 END
+			  OR (cdml.ROOT_IPCD_ID in ('90375','90376','90378','P9047','C9257')) --CH36 --CH37
+			  )
+			 
+		  and ((cdml.IPCD_ID LIKE '_____JW') or (cdml.CDML_IPCD_MOD2 = 'JW') or (cdml.CDML_IPCD_MOD3 = 'JW') or (cdml.CDML_IPCD_MOD4 = 'JW'))
+		  and (((clhp.CLHP_FAC_TYPE = '01') and (clhp.CLHP_BILL_CLASS = '3')) or ((clhp.CLHP_FAC_TYPE = '08') and (clhp.CLHP_BILL_CLASS = '5')))
+		;
+--CH31 END
+
+--CH34 BEGIN
+delete from #drv_tbl where ROOT_IPCD_ID IN ('Q4199','Q0144','Q2052','Q3001','Q4100','Q4101','Q4102','Q4103','Q4104','Q4105','Q4106','Q4107','Q4108','Q4110','Q4111','Q4112','Q4113','Q4114','Q4115','Q4116','Q4117','Q4118','Q4119','Q4120','Q4121','Q4122','Q4123','Q4124','Q4125','Q4126','Q4127','Q4128','Q4129','Q4130','Q4131','Q4132','Q4133','Q4134','Q4135','Q4136','Q4137','Q4138','Q4140','Q4141','Q4142','Q4143','Q4146','Q4147','Q4148','Q4149','Q4150','Q4151','Q4152','Q4153','Q4154','Q4155','Q4156','Q4157','Q4158','Q4159','Q4160','Q4161','Q4162','Q4163','Q4164','Q4165','Q4166','Q4167','Q4168','Q4169','Q4170','Q4172','Q4173','Q4174','Q4175','Q4176','Q4177','Q4178','Q4179','Q4180','Q4181','Q4182','Q4183','Q4184','Q4185','Q4186','Q4187','Q4188','Q4189','Q4190','Q4191','Q4192','Q4193','Q4194','Q4195','Q4196','Q4197','Q4198','Q4200','Q4201','Q4202','Q4203','Q4204','Q4205','Q4206','Q4208','Q4209','Q4210','Q4211','Q4212','Q4213','Q4214','Q4215','Q4216','Q4217','Q4218','Q4219','Q4220','Q4221','Q4222','Q4226','Q4227','Q4228','Q4229','Q4230','Q4231','Q4232','Q4233','Q4234','Q4235','Q4236','Q4237','Q4238','Q4239','Q4240','Q4241','Q4242','Q4245','Q4246','Q4247','Q4248','Q4249','Q4250','Q4251','Q4252','Q4253','Q4254','Q4255','Q9950','Q9951','Q9953','Q9954','Q9955','Q9956','Q9957','Q9958','Q9959','Q9960','Q9961','Q9962','Q9963','Q9964','Q9965','Q9966','Q9967','Q9968','Q9969','Q9977','Q9982','Q9983'); 
+--CH34 END
+
+update #drv_tbl
+	set GROUP_ID = dtg.GROUP_ID
+	from #drv_tbl inner join
+		(select dt.GRGR_CK, dt.MEME_CK, dt.PRPR_ID, dt.CDML_FROM_DT, dt.ROOT_IPCD_ID, 
+		DENSE_RANK() over 
+		    (order by dt.GRGR_CK, dt.MEME_CK, dt.PRPR_ID, dt.CDML_FROM_DT, dt.ROOT_IPCD_ID) AS GROUP_ID  
+		 from #drv_tbl dt) AS dtg on #drv_tbl.MEME_CK = dtg.MEME_CK and
+									 #drv_tbl.PRPR_ID = dtg.PRPR_ID and
+									 #drv_tbl.CDML_FROM_DT = dtg.CDML_FROM_DT and
+									 #drv_tbl.ROOT_IPCD_ID= dtg.ROOT_IPCD_ID; 
+
+
+	insert into #drv_tbl (GRGR_CK, CLCL_ID, CDML_SEQ_NO, MEME_CK, PRPR_ID, CDML_FROM_DT, ROOT_IPCD_ID, GROUP_ID, RECORD_TYPE)
+		select cdml.GRGR_CK, cdml.CLCL_ID, cdml.CDML_SEQ_NO, cdml.MEME_CK, cdml.PRPR_ID, cdml.CDML_FROM_DT, cdml.ROOT_IPCD_ID, dt.GROUP_ID, 'R'	
+		from #drv_tbl dt
+			inner join dw.FAC_CMC_CDML_CL_LINE cdml with (nolock) on dt.MEME_CK = cdml.MEME_CK and
+																	 dt.PRPR_ID = cdml.PRPR_ID and
+																	 dt.CDML_FROM_DT = cdml.CDML_FROM_DT and
+																	 dt.ROOT_IPCD_ID = cdml.ROOT_IPCD_ID
+			--CH34 inner join dw.FAC_CMC_PRPR_PROV prpr with (nolock) on cdml.PRPR_ID = prpr.PRPR_ID and
+			--CH34													  prpr.PRPR_ENTITY = 'P'
+		where cdml.CDML_CUR_STS = '02'
+		  -- CH33 MOVED BELOW and cdml.IPCD_ID like 'J%' -- CH32
+		  and cdml.CDML_PR_PYMT_AMT > 0
+		  and (((cdml.IPCD_ID like 'J%') AND (cdml.ROOT_IPCD_ID between 'J0100' and 'J9999')) -- CH33 MOVED LIKE J% DOWN HERE
+		     -- CH33 BEGIN
+			  OR (cdml.IPCD_ID LIKE 'Q%') -- CH33 END
+			  OR (cdml.ROOT_IPCD_ID in ('90375','90376','90378','P9047','C9257')) --CH36 --CH37
+          )
+		  and not ((cdml.IPCD_ID LIKE '_____JW') or (cdml.CDML_IPCD_MOD2 = 'JW') or (cdml.CDML_IPCD_MOD3 = 'JW') or (cdml.CDML_IPCD_MOD4 = 'JW'))
+		  and dt.RECORD_TYPE = 'O' --CH31
+		;
+
+--CH31 BEGIN
+	insert into #drv_tbl (GRGR_CK, CLCL_ID, CDML_SEQ_NO, MEME_CK, PRPR_ID, CDML_FROM_DT, ROOT_IPCD_ID, GROUP_ID, RECORD_TYPE)
+		select cdml.GRGR_CK, cdml.CLCL_ID, cdml.CDML_SEQ_NO, cdml.MEME_CK, cdml.PRPR_ID, cdml.CDML_FROM_DT, cdml.ROOT_IPCD_ID, dt.GROUP_ID, 'R'	
+		from #drv_tbl dt
+            inner join dw.FAC_CMC_CDML_CL_LINE cdml with (nolock) on dt.MEME_CK = cdml.MEME_CK and
+																	 dt.PRPR_ID = cdml.PRPR_ID and
+																	 dt.CDML_FROM_DT = cdml.CDML_FROM_DT and
+																	 dt.ROOT_IPCD_ID = cdml.ROOT_IPCD_ID
+			inner join dw.FAC_CMC_CLHP_HOSP clhp with (nolock) on cdml.CLCL_ID = clhp.CLCL_ID
+		where cdml.CDML_CUR_STS = '02'
+		  -- CH33 MOVED BELOW and cdml.IPCD_ID like 'J%' -- CH32
+		  and cdml.CDML_PR_PYMT_AMT > 0
+		  and (((cdml.IPCD_ID like 'J%') AND (cdml.ROOT_IPCD_ID between 'J0100' and 'J9999')) -- CH33 MOVED LIKE J% DOWN HERE
+		     -- CH33 BEGIN
+			  OR (cdml.IPCD_ID LIKE 'Q%') -- CH33 END
+			  OR (cdml.ROOT_IPCD_ID in ('90375','90376','90378','P9047','C9257')) --CH36 --CH37
+		  )
+		  and not ((cdml.IPCD_ID LIKE '_____JW') or (cdml.CDML_IPCD_MOD2 = 'JW') or (cdml.CDML_IPCD_MOD3 = 'JW') or (cdml.CDML_IPCD_MOD4 = 'JW'))
+		  and dt.RECORD_TYPE = 'O' --CH31
+		  and (((clhp.CLHP_FAC_TYPE = '01') and (clhp.CLHP_BILL_CLASS = '3')) or ((clhp.CLHP_FAC_TYPE = '08') and (clhp.CLHP_BILL_CLASS = '5')))
+		;
+--CH31 END
+
+--CH34 BEGIN
+delete from #drv_tbl where GROUP_ID in (
+	select dt.GROUP_ID from #drv_tbl dt
+	where exists (select 'x'
+		from dw.FAC_CMC_CLHP_HOSP clhp with (nolock)
+		where dt.CLCL_ID = clhp.CLCL_ID and
+			clhp.CLHP_FAC_TYPE = '07' and
+			clhp.CLHP_BILL_CLASS = '2'
+	)	
 );
+--CH34 END
 
-DELETE FROM DRV_TBL
-WHERE ifnull(DRV_TBL.RECORD_TYPE,'O') = 'O'
-AND NOT EXISTS (SELECT 'x'
-	FROM DRV_TBL AS DT
-	WHERE DRV_TBL.GROUP_ID = DT.GROUP_ID
-		AND DT.RECORD_TYPE = 'R'
-);
+create index dt_idx1 on #drv_tbl (CLCL_ID, CDML_SEQ_NO);
+
+/****************************************************************************************************/
+/* Remove duplicate records																			*/
+/****************************************************************************************************/
+if OBJECT_ID('tempdb..#distinct_dt') is not null
+	drop table #distinct_dt; -- CH02
+	
+select distinct * into #distinct_dt from #drv_tbl;
+truncate table #drv_tbl;
+insert into #drv_tbl select * from #distinct_dt;
+drop table #distinct_dt;
+
+DELETE FROM #drv_tbl
+    FROM #drv_tbl 
+	WHERE isnull(#drv_tbl.RECORD_TYPE,'O') = 'O'
+	AND NOT EXISTS (SELECT 'X'
+		            FROM #drv_tbl dt
+		            WHERE #drv_tbl.GROUP_ID = dt.GROUP_ID
+		              AND dt.RECORD_TYPE = 'R');
+DELETE FROM #drv_tbl
+    FROM #drv_tbl 
+	WHERE isnull(#drv_tbl.RECORD_TYPE,'R') = 'R'
+	AND NOT EXISTS (SELECT 'X'
+		            FROM #drv_tbl dt
+		            WHERE #drv_tbl.GROUP_ID = dt.GROUP_ID
+		              AND dt.RECORD_TYPE = 'O');
 
 /****************************************************************************************************/
 /* Output table for file																			*/
 /****************************************************************************************************/
-drop table if exists report_output;
+if OBJECT_ID('tempdb..#report_output') is not null
+	drop table #report_output;	
 	
-create temporary table report_output (CLCL_ID char(12), GRGR_CK numeric(10,0), SBSB_CK numeric(10,0), CLCL_CUR_STS varchar(2), CLCL_PAID_DT date, CLCL_RECD_DT date,
-							 		  CSCS_ID varchar(4), CSPI_ID varchar(8), PDPD_ID varchar(8), CLCL_ME_AGE numeric(5,0), CLCL_PA_ACCT_NO varchar(35), AGAG_ID char(12),
-							 		  CLCL_EOB_EXCD_ID varchar(3), CDML_SEQ_NO numeric(5,0), MEME_CK numeric(10,0), PRPR_ID char(12), CDML_CUR_STS varchar(2), SEPC_PRICE_ID varchar(4),
-							 		  RCRC_ID varchar(4), SESE_ID varchar(4), SESE_RULE varchar(4), PSCD_ID varchar(2), IPCD_ID varchar(7), IDCD_ID varchar(10), CDML_FROM_DT date, CDML_TO_DT date,
-							 		  CDML_CONSIDER_CHG numeric(18,4), CDML_UNITS numeric(5,0), CDML_UNITS_ALLOW numeric(5,0), CDML_DISALL_EXCD varchar(3), CDML_CL_NTWK_IND char(1), 
-							 		  CDML_CAP_IND char(1), CDML_PR_PYMT_AMT numeric(18,4), CDML_UMAUTH_ID varchar(9), CDML_POS_IND char(1), CDML_IPCD_MOD2 varchar(2), CDML_IPCD_MOD3 varchar(2), 
-							 		  CDML_IPCD_MOD4 varchar(2), MEME_LAST_NAME varchar(35), MEME_FIRST_NAME varchar(15), MEME_MEDCD_NO varchar(20), PRPR_ENTITY char(1), PRPR_NAME varchar(55), 
-							 		  PRPR_MCTR_TYPE varchar(4), PRCF_MCTR_SPEC varchar(4), PRPR_NPI varchar(10), MCTN_ID varchar(9), PRPR_GRP_NAME varchar(55), CLHP_FAC_TYPE varchar(2),
-							 		  CLHP_BILL_CLASS char(1), CLHP_FREQUENCY char(1), CLHP_ADM_TYP varchar(2), CLHP_DC_STAT varchar(2), AGRG_ID varchar(4), CLHP_INPUT_AGRG_ID varchar(4),
-							 		  SEPC_DESC varchar(70), SEIP_PFX varchar(2), CDNP_RATE numeric(13,4), IPRS_RATE numeric(18,4),	CDNP_BASED_ON varchar(30), SBSB_ID char(9), PDDS_DESC varchar(70),
-							 		  PLDS_DESC varchar(70), SESE_DESC varchar(70), IPCD_DESC varchar(175), IDCD_DESC varchar(228),	RCRC_DESC varchar(70), IPRS_EFF_DT date, IPRS_TERM_DT date, 
-							 		  IPRS_DISC_PCT numeric(18,4), EXCD_SHORT_TEXT varchar(40), MCTR_DESC_SPEC varchar(30), MCTR_DESC_TYPE varchar(30), MARKET_NAME varchar(20),
-							 		  GROUP_ID int, GROUP_ORDER int, RECORD_TYPE char(1), PRCR_ID char(12), CLMF_ICD_IND_PROC varchar(1), EXP_DT date, EXPTYPE varchar(4), 
-							 		  CDML_RISK_WH_AMT numeric(18,4), PROJ_EXISTS char(1), ROOT_CLCL_ID char(10), ACR_PAYEE_ID varchar(15),
-							 		  CDML_COINS_AMT numeric(18,4), CDML_COPAY_AMT numeric(18,4), CDML_DED_AMT numeric(18,4), -- CH01
-							 		  CLCL_TOT_PAYABLE numeric(18,4), ORIGRECDDATE date, ORIGPAIDDATE date);
+create table #report_output (CLCL_ID char(12) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, GRGR_CK numeric(10,0), SBSB_CK numeric(10,0), 
+							 CLCL_CUR_STS varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS, CLCL_PAID_DT datetime,  CLCL_RECD_DT datetime,
+							 CSCS_ID varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS, CSPI_ID varchar(8) COLLATE SQL_Latin1_General_CP1_CI_AS, 
+							 PDPD_ID varchar(8) COLLATE SQL_Latin1_General_CP1_CI_AS, CLCL_ME_AGE numeric(5,0),
+							 CLCL_PA_ACCT_NO varchar(35) COLLATE SQL_Latin1_General_CP1_CI_AS, AGAG_ID char(12) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CLCL_EOB_EXCD_ID varchar(3) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CDML_SEQ_NO numeric(5,0) NOT NULL, MEME_CK numeric(10,0) NOT NULL,  PRPR_ID char(12) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CDML_CUR_STS varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS, SEPC_PRICE_ID varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 RCRC_ID varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS, SESE_ID varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS, 
+							 SESE_RULE varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS, PSCD_ID varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS, 
+							 IPCD_ID varchar(7) COLLATE SQL_Latin1_General_CP1_CI_AS, IDCD_ID varchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS, CDML_FROM_DT datetime NOT NULL, CDML_TO_DT datetime,
+							 CDML_CONSIDER_CHG numeric(18,4), CDML_UNITS numeric(5,0), CDML_UNITS_ALLOW numeric(5,0), CDML_DISALL_EXCD varchar(3) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CDML_CL_NTWK_IND char(1) COLLATE SQL_Latin1_General_CP1_CI_AS, CDML_CAP_IND char(1) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CDML_PR_PYMT_AMT numeric(18,4),  CDML_UMAUTH_ID varchar(9) COLLATE SQL_Latin1_General_CP1_CI_AS, CDML_POS_IND char(1) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CDML_IPCD_MOD2 varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 /* DW.FAC_CMC_MEME_MEMBER */
+							 MEME_LAST_NAME varchar(35) COLLATE SQL_Latin1_General_CP1_CI_AS, -- CH25 Changed from 30 to 35 chars
+							 MEME_FIRST_NAME varchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 MEME_MEDCD_NO varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS, 
+							 /* CMC_PRPR_PROV */
+							 PRPR_ENTITY char(1) COLLATE SQL_Latin1_General_CP1_CI_AS, PRPR_NAME varchar(55) COLLATE SQL_Latin1_General_CP1_CI_AS, 
+							 PRPR_MCTR_TYPE varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS, PRCF_MCTR_SPEC varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 PRPR_NPI varchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS, MCTN_ID varchar(9) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 /* CMC_PRPR_PROV via CMC_PRER_RELATION to get PRER_PRPR_ID */
+							 PRPR_GRP_NAME varchar(55) COLLATE SQL_Latin1_General_CP1_CI_AS,					
+							 /* CMC_CLHP_HOSP */				
+							 CLHP_FAC_TYPE varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS,	CLHP_BILL_CLASS char(1) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CLHP_FREQUENCY char(1) COLLATE SQL_Latin1_General_CP1_CI_AS, CLHP_ADM_TYP varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 CLHP_DC_STAT varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS, AGRG_ID varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS, 
+							 CLHP_INPUT_AGRG_ID varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 /* CMC_SEPC_PRICE */
+							 SEPC_DESC varchar(70) COLLATE SQL_Latin1_General_CP1_CI_AS,						
+							 SEIP_PFX varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 /* CMC_CDNP_NWX_PRCNG */
+							 CDNP_RATE numeric(13,4), IPRS_RATE numeric(18,4),									
+							 CDNP_BASED_ON varchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS, 
+							 SBSB_ID char(9) COLLATE SQL_Latin1_General_CP1_CI_AS,								--CMC_SBSB_SUBSC 
+							 PDDS_DESC varchar(70) COLLATE SQL_Latin1_General_CP1_CI_AS,						--DW.FAC_CMC_PDDS_PROD_DESC
+							 PLDS_DESC varchar(70)COLLATE SQL_Latin1_General_CP1_CI_AS,							--DW.FAC_CMC_PLDS_PLAN_DESC
+							 SESE_DESC varchar(70) COLLATE SQL_Latin1_General_CP1_CI_AS,						--DW.FAC_CMC_SESE_SERVICE
+							 IPCD_DESC varchar(175) COLLATE SQL_Latin1_General_CP1_CI_AS,						--DW.FAC_CMC_IPCD_PROC_CD
+							 IDCD_DESC varchar(228) COLLATE SQL_Latin1_General_CP1_CI_AS,						--DW.FAC_CMC_IDCD_DIAG_CD				
+							 RCRC_DESC varchar(70) COLLATE SQL_Latin1_General_CP1_CI_AS,						--DW.FAC_CMC_RCRC_RC_DESC
+							 IPRS_EFF_DT datetime, IPRS_TERM_DT datetime, IPRS_DISC_PCT numeric(18,4),			--DW.FAC_CMC_IPRS_PRICE 
+							 EXCD_SHORT_TEXT varchar(40) COLLATE SQL_Latin1_General_CP1_CI_AS,					--DW.FAC_CMC_EXCD_EXPL_CD
+							 MCTR_DESC_SPEC	varchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS,				    --DW.FAC_CMC_MCTR_CD_TRANS
+							 MCTR_DESC_TYPE	varchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS,					--DW.FAC_CMC_MCTR_CD_TRANS
+							 MARKET_NAME varchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS, -- CH16 CHANGED LENGTH FROM 12 TO 20
+							 GROUP_ID int, GROUP_ORDER int, RECORD_TYPE char(1) COLLATE SQL_Latin1_General_CP1_CI_AS,
+							 PRCR_ID char(12) COLLATE SQL_Latin1_General_CP1_CI_AS, --CH02
+							 CLMF_ICD_IND_PROC varchar(1) COLLATE SQL_Latin1_General_CP1_CI_AS, -- CH25
+							 EXP_DT datetime, EXPTYPE varchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS, -- CH0006B
+							 CDML_RISK_WH_AMT numeric(18,4), PROJ_EXISTS char(1) COLLATE SQL_Latin1_General_CP1_CI_AS, -- CH0008B
+							 ROOT_CLCL_ID char(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, -- CH0008B
+							 ACR_PAYEE_ID varchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS, -- CH0008C
+							 CDSD_NDC_CODE varchar(11) COLLATE SQL_Latin1_General_CP1_CI_AS, ORIGRECDDATE date, ORIGPAIDDATE date,
+							 CDML_ALLOW numeric(18,4), CDML_IPCD_MOD3 varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS, CDML_IPCD_MOD4 varchar(2) COLLATE SQL_Latin1_General_CP1_CI_AS); --CH35
 
-insert into report_output (CLCL_ID, GRGR_CK, SBSB_CK, CLCL_CUR_STS, CLCL_PAID_DT, CLCL_RECD_DT, CSCS_ID, CSPI_ID, PDPD_ID, CLCL_ME_AGE,
-						   CLCL_PA_ACCT_NO, AGAG_ID, CLCL_EOB_EXCD_ID, CDML_SEQ_NO, MEME_CK, PRPR_ID, CDML_CUR_STS, SEPC_PRICE_ID, RCRC_ID, SESE_ID, SESE_RULE,
-						   PSCD_ID, IPCD_ID, IDCD_ID, CDML_FROM_DT, CDML_TO_DT, CDML_CONSIDER_CHG, CDML_UNITS, CDML_UNITS_ALLOW,
-						   CDML_DISALL_EXCD, CDML_CL_NTWK_IND, CDML_CAP_IND, CDML_PR_PYMT_AMT, CDML_UMAUTH_ID, CDML_POS_IND, CDML_IPCD_MOD2,
-						   CDML_RISK_WH_AMT, PROJ_EXISTS, ROOT_CLCL_ID, -- CH0008B
-						   CDML_COINS_AMT, CDML_COPAY_AMT, CDML_DED_AMT, -- CH01
-						   CLCL_TOT_PAYABLE,
-						   GROUP_ID, RECORD_TYPE)
+insert into #report_output (CLCL_ID, GRGR_CK, SBSB_CK,CLCL_CUR_STS, CLCL_PAID_DT, CLCL_RECD_DT, CSCS_ID, CSPI_ID, PDPD_ID, CLCL_ME_AGE,
+							CLCL_PA_ACCT_NO, AGAG_ID, CLCL_EOB_EXCD_ID, CDML_SEQ_NO, MEME_CK, PRPR_ID, CDML_CUR_STS, SEPC_PRICE_ID, RCRC_ID, SESE_ID, SESE_RULE,  
+							PSCD_ID, IPCD_ID, IDCD_ID, CDML_FROM_DT, CDML_TO_DT, CDML_CONSIDER_CHG, CDML_UNITS, CDML_UNITS_ALLOW,
+							CDML_DISALL_EXCD, CDML_CL_NTWK_IND, CDML_CAP_IND, CDML_PR_PYMT_AMT, CDML_UMAUTH_ID, CDML_POS_IND, CDML_IPCD_MOD2,
+							CDML_RISK_WH_AMT, PROJ_EXISTS, ROOT_CLCL_ID, -- CH0008B
+							GROUP_ID, RECORD_TYPE,
+							CDML_ALLOW, CDML_IPCD_MOD3, CDML_IPCD_MOD4) --CH35
 	select CLCL.CLCL_ID, CLCL.GRGR_CK, CLCL.SBSB_CK, CLCL.CLCL_CUR_STS, CLCL.CLCL_PAID_DT, CLCL.CLCL_RECD_DT, CLCL.CSCS_ID, CLCL.CSPI_ID, CLCL.PDPD_ID, CLCL.CLCL_ME_AGE,
 		   CLCL.CLCL_PA_ACCT_NO, CLCL.AGAG_ID, CLCL.CLCL_EOB_EXCD_ID, CDML.CDML_SEQ_NO, CDML.MEME_CK, CDML.PRPR_ID, CDML.CDML_CUR_STS, CDML.SEPC_PRICE_ID, CDML.RCRC_ID, CDML.SESE_ID, CDML.SESE_RULE,  
 		   CDML.PSCD_ID, CDML.IPCD_ID, CDML.IDCD_ID, CDML.CDML_FROM_DT, CDML.CDML_TO_DT, CDML.CDML_CONSIDER_CHG, CDML.CDML_UNITS, CDML.CDML_UNITS_ALLOW,
 		   CDML.CDML_DISALL_EXCD, CDML.CDML_CL_NTWK_IND, CDML.CDML_CAP_IND, CDML.CDML_PR_PYMT_AMT, CDML.CDML_UMAUTH_ID, CDML.CDML_POS_IND, CDML.CDML_IPCD_MOD2,
-		   CDML.CDML_RISK_WH_AMT, 'N', left(clcl.CLCL_ID,10), -- CH0008B
-		   CDML.CDML_COINS_AMT, CDML.CDML_COPAY_AMT, CDML.CDML_DED_AMT, -- CH01
-		   CLCL.CLCL_TOT_PAYABLE,
-		   dt.GROUP_ID, dt.RECORD_TYPE
- 	  from drv_tbl dt
- 		   inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl on dt.clcl_id = clcl.clcl_id
-		   inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CDML_CL_LINE_CMPCT_ACTV cdml on dt.CLCL_ID = cdml.CLCL_ID
-		  																			and dt.CDML_SEQ_NO = cdml.CDML_SEQ_NO;
-   
-drop table if exists drv_tbl; -- CH0009B
+		   CDML.CDML_RISK_WH_AMT, 'N', clcl.ROOT_CLCL_ID, -- CH0008B
+		   dt.GROUP_ID, dt.RECORD_TYPE,
+		   CDML.CDML_ALLOW, CDML.CDML_IPCD_MOD3, CDML.CDML_IPCD_MOD4 --CH35
+ 	  from #drv_tbl dt
+		inner join DW.FAC_CMC_CLCL_CLAIM CLCL with (nolock) on dt.CLCL_ID = clcl.CLCL_ID
+		inner join DW.FAC_CMC_CDML_CL_LINE CDML with (nolock) on dt.CLCL_ID = cdml.CLCL_ID and
+																 dt.CDML_SEQ_NO = cdml.CDML_SEQ_NO;
 
-update report_output as ro
-set ro.CLMF_ICD_IND_PROC = clmf.CLMF_ICD_IND_PROC
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLMF_MULT_FUNC_CMPCT_ACTV clmf 
-where ro.CLCL_ID = clmf.CLCL_ID;
+create index ro_idx1 on #report_output (CLCL_ID, CDML_SEQ_NO);
+
+truncate table #drv_tbl; -- CH0009B
+
+update ro
+	set ro.CLMF_ICD_IND_PROC = clmf.CLMF_ICD_IND_PROC
+from #report_output ro
+	inner join dw.FAC_CMC_CLMF_MULT_FUNC clmf with (nolock) on ro.CLCL_ID = clmf.CLCL_ID;
 
 --CHM0005 BEGIN
-delete from report_output
-where ifnull(RECORD_TYPE,'O') <> 'R'
-  and not(GRGR_CK in (3,34,13,31))
-  and CLCL_TOT_PAYABLE < 25; 
+   delete
+     from #report_output
+       where exists (select 'x'
+                                  from dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) 
+                                    where #report_output.CLCL_ID = clcl.CLCL_ID                                   
+                                      and clcl.CLCL_TOT_PAYABLE < 25)
+      and isnull(#report_output.RECORD_TYPE,'O') = 'O'
+         and not (#report_output.GRGR_CK IN (3,34,13,31));
+                                         
 
-delete from report_output
-where ifnull(RECORD_TYPE,'O') <> 'R'
-  and GRGR_CK in (3,34,13,31)
-  and CLCL_TOT_PAYABLE < 10;
+   delete
+     from #report_output
+       where exists (select 'x'
+                                  from dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) 
+                                    where #report_output.CLCL_ID = clcl.CLCL_ID                                   
+                                      and clcl.CLCL_TOT_PAYABLE < 10)
+      and isnull(#report_output.RECORD_TYPE,'O') = 'O'
+         and #report_output.GRGR_CK IN (3,34,13,31);
 --CHM0005 END
  
---CHM0021a BEGIN
-delete from report_output
-where ifnull(RECORD_TYPE,'O') <> 'R'
-  and GRGR_CK = 234
+delete from #report_output 
+where EXPTYPE = 'PAID'
+  and ISNULL(RECORD_TYPE,'O') <> 'R' -- Ovp claims only
+  and GRGR_CK = 234 
   and EXP_DT >=  CLCL_PAID_DT;
---CHM0021a END
+-- CHM0021a END
  
- --CHM0021b BEGIN
-delete from report_output
+--CHM0021b BEGIN
+delete from #report_output
 where GRGR_CK = 13
-  and CSCS_ID in ('PL10','PL11','PL12','PL95','PL96','PL97','CD04','CD05','CD06','CD07','CD08','CD09')
+  and CSCS_ID IN ('PL10', 'PL11', 'PL12', 'PL95', 'PL96', 'PL97', 'CD04', 'CD05', 'CD06', 'CD07', 'CD08', 'CD09')
   and concat(CLHP_FAC_TYPE,CLHP_BILL_CLASS) in ('066','089')
-  and CDML_FROM_DT > '2024-06-30'::date;
+  and cdml_from_dt > '2024-06-30';
 --CHM0021b END
 
 
 
- -- CH0009C BEGIN
-delete from report_output
-where exists (select 'x'
-        		from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CDML_CL_LINE_CMPCT_ACTV cdml
-	   		   where report_output.CLCL_ID = cdml.CLCL_ID
-	     		 and cdml.CDML_CUR_STS = '02'
-		 		 and report_output.CLCL_PAID_DT > to_date('2018-06-30')
-		 		 and cdml.CDML_DISALL_EXCD in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5' -- CHM0003b ADDED JCN
-				 and cdml.CDML_PR_PYMT_AMT > 0)
-  and ifnull(RECORD_TYPE,'O') <> 'R';
+   -- CH0009C BEGIN
+
+   delete
+     from #report_output
+	where exists (select 'x'
+	                from dw.fac_cmc_cdml_cl_line cdml with (nolock)
+				   where #report_output.clcl_id = cdml.clcl_id
+					 and #report_output.clcl_paid_dt > '2018-06-30'
+					 and cdml.CDML_DISALL_EXCD in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5' -- CHM0003b ADDED JCN
+					 and cdml.cdml_pr_pymt_amt > 0)
+	  and isnull(RECORD_TYPE,'O') <> 'R';
+
    -- CH0009C END
 
--- CHM0003b BEGIN
-delete from report_output
-where exists (select 'x'
-        		from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CDOR_LI_OVR_CMPCT cdor
-	   		   where report_output.CLCL_ID = cdor.CLCL_ID
-		 		 and report_output.CLCL_PAID_DT > to_date('2018-06-30')
-		 		 and cdor.EXCD_ID in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5' 
-				 )
-  and ifnull(RECORD_TYPE,'O') <> 'R';
+	-- CHM0003b BEGIN
 
-delete from report_output
-where exists (select 'x'
-        		from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLOR_CL_OVR_CMPCT clor
-	   		   where report_output.CLCL_ID = clor.CLCL_ID
-		 		 and report_output.CLCL_PAID_DT > to_date('2018-06-30')
-		 		 and clor.EXCD_ID in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5' 
-				 )
-  and ifnull(RECORD_TYPE,'O') <> 'R';
+	delete
+     from #report_output
+	where exists (select 'x'
+	                from dw.fac_cmc_cdor_li_ovr cdor with (nolock)
+				   where #report_output.clcl_id = cdor.clcl_id
+					 and #report_output.clcl_paid_dt > '2018-06-30'
+					 and cdor.EXCD_ID in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5' 
+					 )
+	  and isnull(RECORD_TYPE,'O') <> 'R';
 
-delete from report_output
-where exists (select 'x'
-        		from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.ADJ_CLM_RSN_CMPCT adj
-	   		   where report_output.CLCL_ID = adj.CLCL_ID
-		 		 and report_output.CLCL_PAID_DT > to_date('2018-06-30')
-		 		 and adj.ADJ_RSN_CD in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5'
-				 )
-  and ifnull(RECORD_TYPE,'O') <> 'R';   
--- CHM0003b END
+	delete
+     from #report_output
+	where exists (select 'x'
+	                from dw.fac_cmc_clor_cl_ovr clor with (nolock)
+				   where #report_output.clcl_id = clor.clcl_id
+					 and #report_output.clcl_paid_dt > '2018-06-30'
+					 and clor.EXCD_ID in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5' 
+					 )
+	  and isnull(RECORD_TYPE,'O') <> 'R';
 
- -- CH0008B BEGIN
-update report_output as ro
-   set ro.PROJ_EXISTS = 'Y'    
-where exists (select 'x'
-			    from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CCU_CLAIM_CMPCT cc
-						inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CCU_PROJECT_CMPCT cpc on cc.PROJ_ID = cpc.PROJ_ID
-	   		   where ro.ROOT_CLCL_ID = cc.CLCL_ID10
-		 		 and cc.CCU_STATUS not in ('9','62','64')); --void, void-duplicate, void-nonrecoverable
--- CH0008B END
-		 		 
--- CH0008C BEGIN
-drop table if exists acr_temp;
+	delete
+     from #report_output
+	where exists (select 'x'
+	                from dw.agp_adj_clm_rsn adj with (nolock)
+				   where #report_output.clcl_id = adj.clcl_id
+					 and #report_output.clcl_paid_dt > '2018-06-30'
+					 and adj.ADJ_RSN_CD in ('J00','J01','J02','JCN','YHK','EAM','G03','G97','FD3','FD4','FD5') --CHM0020 Added 'YHK','EAM','G03','G97','FD3','FD4','FD5'
+					 )
+	  and isnull(RECORD_TYPE,'O') <> 'R';
+   
+	-- CHM0003b END
 
-create temporary table acr_temp (CLCL_ID char(12), ACR_PAYEE_ID varchar(15));
+	-- CH0008B BEGIN
+	CREATE INDEX CRI_IDX1 ON #report_output(ROOT_CLCL_ID); 
+	CREATE INDEX CRI_IDX2 ON #report_output(GRGR_CK, CLCL_ID, CDML_SEQ_NO); 
 
+		update #report_output
+		   set PROJ_EXISTS = 'Y'    
+		where EXISTS (SELECT 'X'
+				FROM CCERT.dbo.CCU_CLAIM CC WITH (NOLOCK)
+					INNER JOIN CCERT.dbo.CCU_PROJECT CP WITH (NOLOCK) ON CC.PROJ_ID = CP.PROJ_ID
+			   WHERE #report_output.ROOT_CLCL_ID = CC.CLCL_ID10
+				 AND CC.CCU_STATUS NOT IN ('9','62','64')); --void, void-duplicate, void-nonrecoverable
+	-- CH0008B END
+
+	-- CH0008C BEGIN
+	if OBJECT_ID('tempdb..#acr_temp') is not null
+		drop table #acr_temp;	
+
+	create table #acr_temp (CLCL_ID char(12) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+							ACR_PAYEE_ID varchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS)
+	
 -- CH0009A begin
-insert into acr_temp
-select report_output.CLCL_ID, min(clov.PRPR_ID) as ACR_PAYEE_ID
-  from report_output
-     inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLOV_OVERPAY_CMPCT_ACTV clov on report_output.CLCL_ID = clov.CLCL_ID
- where exists (select 'x' 
-       			 from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.XREF_LOBD_ROUTING_CMPCT lobd
-                where clov.LOBD_ID = lobd.LOBD_ID
-			      and lobd.CLM_TRGT_SYS = '2'
-			      and lobd.CAP_TRGT_SYS = '2')
- group by report_output.CLCL_ID;
+
+	insert into #acr_temp
+	SELECT #REPORT_OUTPUT.CLCL_ID, min(clov.PRPR_ID) as ACR_PAYEE_ID
+      from #REPORT_OUTPUT
+	     inner join odw.dw.FAC_CMC_CLOV_OVERPAY clov with (nolock) on #report_output.clcl_id = clov.clcl_id
+     where exists (select 'x' from odw.dw.agp_xref_lobd_routing lobd with (nolock)
+                    where clov.lobd_id = lobd.lobd_id
+				      and lobd.clm_trgt_sys = '2'
+				      and lobd.cap_trgt_sys = '2')
+     group by #REPORT_OUTPUT.CLCL_ID;
+
 -- CH0009A end
 		
-insert into acr_temp
-select report_output.CLCL_ID, min(ACR.ACR_PAYEE_ID) as ACR_PAYEE_ID
-  from report_output
-	   inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.NEG_BAL_IMPORT_HISTORY_CMPCT_ACTV acr on report_output.CLCL_ID = acr.ACR_CLAIM_ID
- where not exists (select 'x' from acr_temp act where report_output.CLCL_ID = act.CLCL_ID)  -- CH0009A
-   and exists (select 'x' from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_GRGR_GROUP_CMPCT_ACTV grgr
-                where report_output.GRGR_CK = grgr.GRGR_CK
-                  and grgr.GRGR_MCTR_VIP = 'B')
-group by report_output.CLCL_ID;
-					
-update report_output as ro
-   set ro.ACR_PAYEE_ID = act.ACR_PAYEE_ID
-  from acr_temp act
-where ro.CLCL_ID = act.CLCL_ID;
--- CH0008C END
+	insert into #acr_temp
+	SELECT #REPORT_OUTPUT.CLCL_ID, min(ACR.ACR_PAYEE_ID) as ACR_PAYEE_ID
+	  FROM #report_output
+		   inner join DW.AGP_NEG_BAL_IMPORT_HISTORY ACR with (nolock) on #report_output.CLCL_ID = ACR.ACR_CLAIM_ID
+	 WHERE not exists (select 'x' from #acr_temp at where #report_output.clcl_id = at.clcl_id)  -- CH0009A
+	   and EXISTS (SELECT 'X' FROM DW.FAC_CMC_GRGR_GROUP EX WITH (NOLOCK) 
+                    where #REPORT_OUTPUT.GRGR_CK = EX.GRGR_CK
+                     and ex.GRGR_MCTR_VIP = 'B')
+	GROUP BY #REPORT_OUTPUT.CLCL_ID;
 
--- CH0008D BEGIN
-delete from report_output
-where GRGR_CK = 6
-  and CDML_FROM_DT < to_date('2017-01-01')
-  and ifnull(RECORD_TYPE,'O') <> 'R';
--- CH0008D END
+	CREATE INDEX AT_IDX1 ON #acr_temp(CLCL_ID);
+					
+	update #report_output
+	   set ACR_PAYEE_ID = AT.ACR_PAYEE_ID
+	  from #report_output
+		inner join #acr_temp AT on #report_output.CLCL_ID = at.CLCL_ID;
+	 -- CH0008C END
+
+	-- CH0008D BEGIN
+	Delete
+	  from #report_output
+	 where grgr_ck = 6
+	   and cdml_from_dt < '2017-01-01'
+	   and isnull(RECORD_TYPE,'O') <> 'R';
+	-- CH0008D END
 		 	
+
+/****************************************************************************************************/
+/* CH13 -- Delete Non Dual Markets Until Plan to work the Market									*/
+/****************************************************************************************************/
+delete from #report_output 
+	where GRGR_CK in (40,10,12) and RECORD_TYPE = 'O'; -- CH17 ADDED NM(10)-- CH0007B ADDED 12 -- CH30 REMOVE 37,39,52
+	
 /****************************************************************************************************/
 /* Exclude Unrecoverable																			*/
 /****************************************************************************************************/
-delete from report_output where GRGR_CK in (10,12,15,20,22); -- CH0007B ADDED 12
+delete from #report_output where GRGR_CK in (15,20,22,12) and RECORD_TYPE = 'O'; -- CH06 VA and OH-- CH0007B ADDED 12
 
-delete from report_output
-using exclude_disall_excd 
-where report_output.CDML_DISALL_EXCD = exclude_disall_excd.CDML_DISALL_EXCD
-  and ifnull(RECORD_TYPE,'O') <> 'R';
+delete from #report_output 
+	from #report_output inner join #exclude_disall_excd on #report_output.CDML_DISALL_EXCD = #exclude_disall_excd.CDML_DISALL_EXCD and RECORD_TYPE = 'O';
 
-delete from report_output
-	where CLCL_EOB_EXCD_ID in ('FA6','FA8')  -- claim level HMS and Connolly
-	  and ifnull(RECORD_TYPE,'O') <> 'R';
+delete from #report_output
+	where CLCL_EOB_EXCD_ID in ('FA6','FA8') and RECORD_TYPE = 'O';  -- claim level HMS and Connolly	
 
-delete from report_output
-    where report_output.GRGR_CK = 31
-	  and ifnull(RECORD_TYPE,'O') <> 'R'
-	  and exists (select 'x'
-                    from report_output ro
-                   where report_output.GRGR_CK = ro.GRGR_CK
-                     and report_output.CLCL_ID = ro.CLCL_ID
-                     and ro.CDML_FROM_DT < to_date('2013-11-01'));
-
+-- CH11 BEGIN
+delete from #report_output
+    where #report_output.GRGR_CK = 31
+      and exists (select 'x'
+                    from #report_output ro
+                   where #report_output.CLCL_ID = ro.CLCL_ID
+                     and ro.CDML_FROM_DT < '2013-11-01') and RECORD_TYPE = 'O';
+                     
+-- CH11 END
+		  
 /****************************************************************************************************/
 /* Update Market Name and PDDS Desc																	*/
 /****************************************************************************************************/
-update report_output as ro
-	set ro.MARKET_NAME = markets.MARKET_NAME
-FROM markets 
-where ro.GRGR_CK = markets.GRGR_CK
-  and (substring(ro.CSCS_ID,3,2) = markets.CSCS_ID_3_2 or markets.CSCS_ID_3_2 is null);
+update #report_output
+	set MARKET_NAME = #markets.MARKET_NAME
+from #report_output INNER JOIN #markets on #markets.GRGR_CK = #report_output.GRGR_CK 
+									 AND (#markets.CSCS_ID_3_2 = SUBSTRING(#report_output.CSCS_ID,3,2) OR #markets.CSCS_ID_3_2 is NULL);
 
-update report_output
-   set MARKET_NAME = case when CSCS_ID in ('CD00','CD01','PL00','PL01','PL02','PL07') then 'TN-MIDDLE GRAND' -- CH0007A
+update #report_output
+   set MARKET_NAME = CASE when CSCS_ID IN ('CD00','CD01','PL00','PL01','PL02','PL07') then 'TN-MIDDLE GRAND' -- CH0007A
                           when CSCS_ID IN ('CD02','PL03','PL05','CD90','PL90','PL93','PL08') then 'TN-EAST'  -- CH0007A
                           when CSCS_ID IN ('CD03','PL04','PL06','CD91','PL91','PL94','PL09') then 'TN-WEST'  -- CH0007A
-                     else 'TN' end
+                     ELSE 'TN' END
 where GRGR_CK = 13;
 
-update report_output as ro
-	set ro.PDDS_DESC = pdpd.PDDS_DESC 
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_PDDS_PROD_DESC_CMPCT_ACTV pdpd
-where ro.PDPD_ID = pdpd.PDPD_ID;
+update #report_output
+	set PDDS_DESC = PDPD.PDDS_DESC 
+from #report_output INNER JOIN DW.FAC_CMC_PDDS_PROD_DESC PDPD with (nolock) on #report_output.PDPD_ID = PDPD.PDPD_ID;
 
-update report_output as ro
-	set ro.PRPR_ENTITY = prpr.PRPR_ENTITY, ro.PRPR_MCTR_TYPE = prpr.PRPR_MCTR_TYPE, ro.PRCF_MCTR_SPEC = prpr.PRCF_MCTR_SPEC, ro.PRPR_NAME = prpr.PRPR_NAME,
-		ro.PRPR_NPI = prpr.PRPR_NPI, ro.MCTN_ID = prpr.MCTN_ID,
-		ro.PRCR_ID = prpr.PRCR_ID
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_PRPR_PROV_CMPCT_ACTV prpr
-where ro.PRPR_ID = prpr.PRPR_ID;
+update #report_output
+	set PRPR_ENTITY = PRPR.PRPR_ENTITY, PRPR_MCTR_TYPE = PRPR.PRPR_MCTR_TYPE, PRCF_MCTR_SPEC = PRPR.PRCF_MCTR_SPEC, PRPR_NAME = PRPR.PRPR_NAME,
+		PRPR_NPI = PRPR.PRPR_NPI, MCTN_ID = PRPR.MCTN_ID,
+		PRCR_ID = PRPR.PRCR_ID
+from #report_output inner join DW.FAC_CMC_PRPR_PROV PRPR with (nolock) on #report_output.PRPR_ID = PRPR.PRPR_ID;
 
 /****************************************************************************************************/
 /* Gather remaining data for report.																*/
 /****************************************************************************************************/
-update report_output as ro
-	set ro.RCRC_DESC = rcrc.RCRC_DESC
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_RCRC_RC_DESC_CMPCT_ACTV rcrc
-where ro.RCRC_ID = rcrc.RCRC_ID;
+update #report_output
+	set RCRC_DESC = RCRC.RCRC_DESC
+from #report_output INNER JOIN DW.FAC_CMC_RCRC_RC_DESC RCRC with (nolock) on #report_output.RCRC_ID = RCRC.RCRC_ID;
 
-update report_output as ro
-	set ro.IPCD_DESC = ipcd.IPCD_DESC
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_IPCD_PROC_CD_CMPCT_ACTV ipcd
-where ro.IPCD_ID = ipcd.IPCD_ID;
+update #report_output
+	set IPCD_DESC = IPCD.IPCD_DESC
+from #report_output INNER JOIN DW.FAC_CMC_IPCD_PROC_CD IPCD with (nolock) on #report_output.IPCD_ID = IPCD.IPCD_ID;
 
-update report_output as ro
-	set ro.MEME_FIRST_NAME = P01_PROTEGRITY.SCRTY_ACS_CNTRL.ANTM_MBR_NAME_DETOK(meme.MEME_FIRST_NAME), 
-		ro.MEME_LAST_NAME = P01_PROTEGRITY.SCRTY_ACS_CNTRL.ANTM_MBR_NAME_DETOK(meme.MEME_LAST_NAME), 
-		ro.MEME_MEDCD_NO = P01_PROTEGRITY.SCRTY_ACS_CNTRL.ANTM_MBR_IDENTIFIERS_DETOK(meme.MEME_MEDCD_NO)
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_MEME_MEMBER_CMPCT_ACTV meme
-where ro.MEME_CK = meme.MEME_CK;
+update #report_output
+	set MEME_FIRST_NAME = MEME.MEME_FIRST_NAME, MEME_LAST_NAME = MEME.MEME_LAST_NAME, MEME_MEDCD_NO = MEME.MEME_MEDCD_NO
+from #report_output INNER JOIN DW.FAC_CMC_MEME_MEMBER MEME with (nolock) on #report_output.MEME_CK = MEME.MEME_CK;
 
-update report_output as ro
-	set ro.SBSB_ID = P01_PROTEGRITY.SCRTY_ACS_CNTRL.ANTM_MBR_IDENTIFIERS_DETOK(sbsb.SBSB_ID)
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_SBSB_SUBSC_CMPCT_ACTV sbsb
-where ro.SBSB_CK = sbsb.SBSB_CK;
+update #report_output
+	set SBSB_ID = SBSB.SBSB_ID 
+from #report_output INNER JOIN DW.FAC_CMC_SBSB_SUBSC SBSB with (nolock) on #report_output.SBSB_CK = SBSB.SBSB_CK;
 
-update report_output as ro
-	set ro.SESE_DESC = sese.SESE_DESC 
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_SESE_SERVICE_CMPCT_ACTV sese
-where ro.SESE_ID = sese.SESE_ID
-  and ro.SESE_RULE = sese.SESE_RULE;
+-- CH26 BEGIN
+delete from #report_output
+ where grgr_ck = 54
+   and exists (select 'x'
+		         from odw.DW.FAC_CMC_GRGR_GROUP GR WITH (NOLOCK)  
+				       INNER JOIN DW.FAC_FHP_PMED_MEMBER_D PMED WITH (NOLOCK) ON GR.GRGR_ID = LEFT(PMED.PMED_ID,LEN(GR.GRGR_ID))
+				       INNER JOIN DW.FAC_FHP_PMCC_COMM_X PMCC WITH (NOLOCK) ON PMED.PMED_CKE = PMCC.PMED_CKE
+				where #report_output.GRGR_CK = GR.GRGR_CK
+				  and LEFT(PMED.PMED_ID,LEN(GR.GRGR_ID+RTRIM(#report_output.SBSB_ID))) = gr.GRGR_ID+RTRIM(#report_output.SBSB_ID)) and RECORD_TYPE = 'O';
+-- CH26 END	
 
-update report_output as ro
-	set ro.IDCD_DESC = idcd.IDCD_DESC 
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_IDCD_DIAG_CD_CMPCT_ACTV idcd
-where ro.IDCD_ID = idcd.IDCD_ID
-  and idcd.IDCD_TYPE = case when ro.CLMF_ICD_IND_PROC = '9' then 'I'
-						    when ro.CLMF_ICD_IND_PROC = '0' then 'T'
-						    else 'I' end;
+update #report_output
+	set SESE_DESC = SESE.SESE_DESC 
+from #report_output INNER JOIN DW.FAC_CMC_SESE_SERVICE SESE with (nolock) on #report_output.SESE_ID = SESE.SESE_ID
+																			and #report_output.SESE_RULE = SESE.SESE_RULE;
 
-update report_output as ro
-	set ro.PLDS_DESC = plds.PLDS_DESC 
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_PLDS_PLAN_DESC_CMPCT_ACTV plds
-where ro.CSPI_ID = plds.CSPI_ID;
+update #report_output
+	set IDCD_DESC = IDCD.IDCD_DESC 
+from #report_output INNER JOIN DW.FAC_CMC_IDCD_DIAG_CD IDCD with (nolock) on #report_output.IDCD_ID = IDCD.IDCD_ID
+and idcd.IDCD_TYPE = case when CLMF_ICD_IND_PROC = '9' then 'I'
+						  when CLMF_ICD_IND_PROC = '0' then 'T'
+						  else 'I' end;
 
-update report_output as ro
-	set ro.CLHP_FAC_TYPE = clhp.CLHP_FAC_TYPE, ro.CLHP_BILL_CLASS = clhp.CLHP_BILL_CLASS, ro.CLHP_FREQUENCY = clhp.CLHP_FREQUENCY,
-		ro.CLHP_ADM_TYP = clhp.CLHP_ADM_TYP, ro.CLHP_DC_STAT = clhp.CLHP_DC_STAT, ro.AGRG_ID = clhp.AGRG_ID, ro.CLHP_INPUT_AGRG_ID = clhp.CLHP_INPUT_AGRG_ID
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLHP_HOSP_CMPCT_ACTV clhp
-where ro.CLCL_ID = clhp.CLCL_ID;
+update #report_output
+	set PLDS_DESC = PLDS.PLDS_DESC 
+from #report_output INNER JOIN DW.FAC_CMC_PLDS_PLAN_DESC PLDS with (nolock) on #report_output.CSPI_ID = PLDS.CSPI_ID;
 
-update report_output as ro
-	set ro.EXCD_SHORT_TEXT = excd.EXCD_SHORT_TEXT
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_EXCD_EXPL_CD_CMPCT_ACTV excd
-where ro.CDML_DISALL_EXCD = excd.EXCD_ID;
+-- CH29 BEGIN
+delete from #report_output
+ where grgr_ck = 54
+   and CSPI_ID = 'IAFPWV00' and RECORD_TYPE = 'O';
+-- CH29 END	
 
-update report_output as ro
-	set ro.PRPR_GRP_NAME = prpr_grp.PRPR_NAME
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_PRER_RELATION_CMPCT_ACTV prer
-	inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_PRPR_PROV_CMPCT_ACTV prpr_grp on prer.PRER_PRPR_ID = prpr_grp.PRPR_ID
-where ro.PRPR_ID = prer.PRPR_ID 
-  and prer.PRER_PRPR_ENTITY = 'G'
-  and ro.CDML_FROM_DT between prer.PRER_EFF_DT and prer.PRER_TERM_DT;
+update #report_output
+	set CLHP_FAC_TYPE = CLHP.CLHP_FAC_TYPE, CLHP_BILL_CLASS = CLHP.CLHP_BILL_CLASS, CLHP_FREQUENCY = CLHP.CLHP_FREQUENCY,
+		CLHP_ADM_TYP = CLHP.CLHP_ADM_TYP, CLHP_DC_STAT = CLHP.CLHP_DC_STAT, AGRG_ID = CLHP.AGRG_ID, CLHP_INPUT_AGRG_ID = CLHP.CLHP_INPUT_AGRG_ID
+from #report_output INNER JOIN DW.FAC_CMC_CLHP_HOSP CLHP with (nolock) on #report_output.CLCL_ID = CLHP.CLCL_ID;
 
-update report_output as ro
-	set ro.CDNP_RATE = cdnp.CDNP_RATE, 
-	    ro.CDNP_BASED_ON = cdnp.CDNP_BASED_ON
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CDNP_NWX_PRCNG_CMPCT_ACTV cdnp
-where ro.CLCL_ID = cdnp.CLCL_ID
-  and ro.CDML_SEQ_NO = cdnp.CDNP_LINE_SEQ_NO 
-  and cdnp.CDNP_SEQ_NO = 1;
+update #report_output
+	set EXCD_SHORT_TEXT = EXCD.EXCD_SHORT_TEXT
+from #report_output INNER JOIN DW.FAC_CMC_EXCD_EXPL_CD EXCD with (nolock) on #report_output.CDML_DISALL_EXCD COLLATE SQL_Latin1_General_CP1_CI_AS = EXCD.EXCD_ID;
+
+update #report_output
+	set PRPR_GRP_NAME = PRPR_GRP.PRPR_NAME
+from #report_output INNER JOIN DW.FAC_CMC_PRER_RELATION PRER with (nolock) on #report_output.PRPR_ID  = PRER.PRPR_ID AND PRER.PRER_PRPR_ENTITY='G'
+	AND #report_output.CDML_FROM_DT BETWEEN PRER.PRER_EFF_DT AND PRER.PRER_TERM_DT
+	INNER JOIN DW.FAC_CMC_PRPR_PROV PRPR_GRP with (nolock) on PRER.PRER_PRPR_ID = PRPR_GRP.PRPR_ID;
+
+update ro
+      set CDNP_RATE = CDNP.CDNP_RATE, 
+		  CDNP_BASED_ON = CDNP.CDNP_BASED_ON
+from #report_output ro 
+	inner join DW.FAC_CMC_CDNP_NWX_PRCNG CDNP with (nolock) on ro.GRGR_CK = CDNP.GRGR_CK -- CHM0004
+														   and ro.CLCL_ID = CDNP.CLCL_ID
+														   and ro.CDML_SEQ_NO = CDNP.CDNP_LINE_SEQ_NO
+														   and CDNP.CDNP_SEQ_NO = 1;
  
-update report_output as ro
-	set ro.SEPC_DESC = sepc.SEPC_DESC, ro.SEIP_PFX = sepc.SEPC_RCS_PFX
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_SEPC_PRICE_CMPCT_ACTV sepc
-where ro.SEPC_PRICE_ID = sepc.SEPC_PRICE_ID;
+update #report_output
+	set SEPC_DESC = SEPC.SEPC_DESC, SEIP_PFX = SEPC.SEPC_RCS_PFX
+from #report_output INNER JOIN DW.FAC_CMC_SEPC_PRICE SEPC with (nolock) on #report_output.SEPC_PRICE_ID = SEPC.SEPC_PRICE_ID
 					
-update report_output as ro
-	set ro.IPRS_RATE = iprs.IPRS_RATE, ro.IPRS_DISC_PCT = iprs.IPRS_DISC_PCT, ro.IPRS_EFF_DT = iprs.IPRS_EFF_DT, ro.IPRS_TERM_DT = iprs.IPRS_TERM_DT
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_IPRS_PRICE_CMPCT_ACTV iprs
-where ro.SEIP_PFX = iprs.SEIP_PFX
-  and ro.IPCD_ID = iprs.IPCD_ID
-  and ro.CDML_FROM_DT between iprs.IPRS_EFF_DT and iprs.IPRS_TERM_DT;
- 
-/****************************************************************************************************/
-/* Block ALL claims for members in IA HIPPA FP waiver.												*/
-/****************************************************************************************************/
-delete from report_output as ro
-using P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_GRGR_GROUP_CMPCT_ACTV grgr
-   inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.FHP_PMED_MEMBER_D_CMPCT_ACTV pmed on grgr.GRGR_ID = left(pmed.PMED_ID,length(grgr.GRGR_ID))
-   inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.FHP_PMCC_COMM_X_CMPCT_ACTV pmcc on pmed.PMED_CKE = pmcc.PMED_CKE
-where ro.GRGR_CK = 54
-  and ifnull(ro.RECORD_TYPE,'O') <> 'R'
-  and ro.GRGR_CK = grgr.GRGR_CK
-  and left(pmed.PMED_ID,length(concat(grgr.GRGR_ID,rtrim(ro.SBSB_ID)))) = concat(grgr.GRGR_ID,rtrim(ro.SBSB_ID));
-
-delete from report_output
- where GRGR_CK = 54
-   and ifnull(RECORD_TYPE,'O') <> 'R'
-   and CSPI_ID = 'IAFPWV00';	
+update #report_output
+	set IPRS_RATE = IPRS.IPRS_RATE, IPRS_DISC_PCT = IPRS.IPRS_DISC_PCT, IPRS_EFF_DT = IPRS.IPRS_EFF_DT, IPRS_TERM_DT = IPRS.IPRS_TERM_DT
+from #report_output INNER JOIN DW.FAC_CMC_IPRS_PRICE IPRS with (nolock) on #report_output.SEIP_PFX = IPRS.SEIP_PFX
+																	   AND #report_output.IPCD_ID = IPRS.IPCD_ID
+																	   AND #report_output.CDML_FROM_DT BETWEEN IPRS.IPRS_EFF_DT AND IPRS.IPRS_TERM_DT;
 
 /****************************************************************************************************/
 /* Delete unrecoverable																				*/
 /****************************************************************************************************/
-delete from report_output
+delete from #report_output
 	where MEME_MEDCD_NO = 'AGPCLMRCOUP';
 
-delete from report_output
- where left(CLCL_ID,1) = 'H';
+-- CH02 START	
+/* CH0006B BEGIN
+Delete from #report_output
+  where GRGR_CK = 7 
+    and CDML_TO_DT <	@GAMarketDOS
+    AND ISNULL(RECORD_TYPE,'O') <> 'R'; -- Reference claims
+END CH0006B*/    
+-- CH02 END
 
---CH0009D BEGIN
-delete from report_output as ro
- where ro.GRGR_CK in (4,23,27,88,52)
-   and ifnull(ro.RECORD_TYPE,'O') <> 'R'
+-- CH08 Begin
+delete from #report_output
+ where LEFT(clcl_id,1) = 'H';
+-- CH08 End
+
+/* CH0009D BEGIN.. CHANGED TO BELOW
+-- CH22 Begin
+delete  -- select MARKET_NAME, AGAG_ID AS AGREEMENT, PRCF_MCTR_SPEC, PRPR_MCTR_TYPE, CLCL_ID, CDML_SEQ_NO, RCRC_ID -- (13)
+from #report_output
+ where (((AGAG_ID in ('TX00NURFRUGS', 'TX00ONOARUGS', 'TX00STATERES', 'TX00ONHOLDPR', 'TX00ONNFRUGS')) 
+       OR (LEFT(AGAG_ID,6) = 'BCTEMP')) -- CH28
+  and  RCRC_ID in ('0100','0101','0230','0410','0430','0431','0433')
+  and ((PRCF_MCTR_SPEC in ('S098','S173'))
+       or
+       (PRPR_MCTR_TYPE in ('S098','S173'))));
+
+-- CH22 End
+END CH0009D*/
+
+-- CH0009D BEGIN
+delete from #report_output
+from #report_output
+   inner join #report_output ro on #report_output.clcl_id = ro.clcl_id
+ where ro.grgr_ck in (4,23,27,88,52)
+   and isnull(ro.RECORD_TYPE,'O') <> 'R'
    and ((ro.PRCF_MCTR_SPEC in ('S098','S173'))
        or
        (ro.PRPR_MCTR_TYPE in ('S098','S173')))
-   and ro.RCRC_ID in ('0100','0101','0230','0410','0430','0431','0433')
+   and  ro.RCRC_ID in ('0100','0101','0230','0410','0430','0431','0433')
    and not exists (select 'x'
-                     from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CDML_CL_LINE_CMPCT_ACTV cdml 
-					where ro.CLCL_ID = cdml.CLCL_ID
-					  and cdml.CDML_SEQ_NO = 1
-					  and cdml.RCRC_ID = '022'
-					  and cdml.CDML_PR_PYMT_AMT > 0);
---CH0009D END		 
+                     from odw.dw.fac_cmc_cdml_cl_line cdml with (nolock) 
+					 where ro.clcl_id = cdml.clcl_id
+					   and cdml.cdml_seq_no = 1
+					   and cdml.rcrc_id = '022'
+					   and cdml.cdml_pr_pymt_amt > 0);
+-- CH0009D END  
 
 -- CH0006B BEGIN
- update report_output as ro
-    set ro.EXP_DT = dateadd(month,mrt.MONTHS_TO_EXPIRE,current_date())
-   from mktexp_rtbl mrt
- where ro.GRGR_CK = mrt.GRGR_CK
-    and 
-	-- CHM0022b BEGIN
-		-- ((1 = (case when ro.GRGR_CK = 3 and ro.CLHP_FAC_TYPE IS null and t.EXPIRATION_ID = 6 then 1 else 2 end))      
-        -- or																											 
-        -- (1 = (case when ro.GRGR_CK = 3 and ro.CLHP_FAC_TYPE IS not null and t.EXPIRATION_ID = 28 then 1 else 2 end))  
-  		((1 = (case when ro.GRGR_CK = 3 and ro.CLHP_FAC_TYPE is null and substring(ro.IPCD_ID,1,5) <> 'T2030' and mrt.EXPIRATION_ID = 6 then 1 else 2 end))
-        or																										
-        (1 = (case when ro.GRGR_CK = 3 and (ro.CLHP_FAC_TYPE is not null or substring(ro.IPCD_ID,1,5) = 'T2030') and mrt.EXPIRATION_ID = 28 then 1 else 2 end)) 
-    -- CHM0022b END	
-        or
-        (1 = (case when ro.GRGR_CK = 67 and ro.CLHP_FAC_TYPE is null and mrt.EXPIRATION_ID = 3907 then 1 else 2 end)) -- CH0007D
-        or
-        (1 = (case when ro.GRGR_CK = 67 and ro.CLHP_FAC_TYPE is not null and mrt.EXPIRATION_ID = 3908 then 1 else 2 end)) -- CH0007D
-        or
+ update #report_output
+    set EXP_DT = (select DATEADD(MONTH,t.MONTHS_TO_EXPIRE,GETDATE())
+                    from #mktexp_rtbl t
+                   where #report_output.GRGR_CK = t.GRGR_CK
+                     and
+					 -- CHM0022b BEGIN
+						-- ((1 = (case when #report_output.GRGR_CK = 3 and #report_output IS null and t.EXPIRATION_ID = 6 then 1 else 2 end))      
+						-- or																											 
+						-- (1 = (case when #report_output.GRGR_CK = 3 and #report_output.CLHP_FAC_TYPE IS not null and t.EXPIRATION_ID = 28 then 1 else 2 end))  
+  						((1 = (case when #report_output.GRGR_CK = 3 and #report_output.CLHP_FAC_TYPE is null and substring(#report_output.IPCD_ID,1,5) <> 'T2030' and t.EXPIRATION_ID = 6 then 1 else 2 end))
+						or																										
+						(1 = (case when #report_output.GRGR_CK = 3 and (#report_output.CLHP_FAC_TYPE is not null or substring(#report_output.IPCD_ID,1,5) = 'T2030') and t.EXPIRATION_ID = 28 then 1 else 2 end)) 
+					-- CHM0022b END		
+                          or
+                          (1 = (case when #report_output.GRGR_CK = 67 and #report_output.CLHP_FAC_TYPE IS null and t.EXPIRATION_ID = 3907 then 1 else 2 end)) -- CH0007D
+                          or
+                          (1 = (case when #report_output.GRGR_CK = 67 and #report_output.CLHP_FAC_TYPE IS not null and t.EXPIRATION_ID = 3908 then 1 else 2 end)) -- CH0007D
+                          or
     -- CHM0007 BEGIN
 		-- (1 = (case when #report_output.GRGR_CK = 28 and #report_output.CLCL_PAID_DT < '2020-01-01' and t.EXPIRATION_ID = 3640 then 1 else 2 end))  --CHM0019
 		--                          or
@@ -716,20 +1000,21 @@ delete from report_output as ro
         -- CHM0007 END
 		--		or
 	-- CHM0024 END
-			 (1 = (case when ro.GRGR_CK NOT IN (3,67) then 1 else 2 end))); -- CH0007D change <> 3 to NOT IN (3,67)  --CHM0007 Add 28 -CHM0024 Remove 28
+			 (1 = (case when #report_output.GRGR_CK NOT IN (3,67) then 1 else 2 end))) -- CH0007D change <> 3 to NOT IN (3,67)  --CHM0007 Add 28 -CHM0024 Remove 28
+                   )
 
- update report_output as ro		
-    set ro.EXPTYPE = mrt.EXPTYPE
-   from mktexp_rtbl mrt
-  where ro.GRGR_CK = mrt.GRGR_CK
-    and ((1 = (case when ro.GRGR_CK = 3 and ro.CLHP_FAC_TYPE is null and mrt.EXPIRATION_ID = 6 then 1 else 2 end))
-        or
-        (1 = (case when ro.GRGR_CK = 3 and ro.CLHP_FAC_TYPE is not null and mrt.EXPIRATION_ID = 28 then 1 else 2 end))
-        or
-        (1 = (case when ro.GRGR_CK = 67 and ro.CLHP_FAC_TYPE is null and mrt.EXPIRATION_ID = 3907 then 1 else 2 end)) -- CH0007D
-        or
-        (1 = (case when ro.GRGR_CK = 67 and ro.CLHP_FAC_TYPE is not null and mrt.EXPIRATION_ID = 3908 then 1 else 2 end)) -- CH0007D
-        or
+,
+        EXPTYPE = (select t.EXPTYPE
+                    from #mktexp_rtbl t
+                   where #report_output.GRGR_CK = t.GRGR_CK
+                     and ((1 = (case when #report_output.GRGR_CK = 3 and #report_output.CLHP_FAC_TYPE IS null and t.EXPIRATION_ID = 6 then 1 else 2 end))
+                          or
+                          (1 = (case when #report_output.GRGR_CK = 3 and #report_output.CLHP_FAC_TYPE IS not null and t.EXPIRATION_ID = 28 then 1 else 2 end))
+                          or
+                          (1 = (case when #report_output.GRGR_CK = 67 and #report_output.CLHP_FAC_TYPE IS null and t.EXPIRATION_ID = 3907 then 1 else 2 end)) -- CH0007D
+                          or
+                          (1 = (case when #report_output.GRGR_CK = 67 and #report_output.CLHP_FAC_TYPE IS not null and t.EXPIRATION_ID = 3908 then 1 else 2 end)) -- CH0007D
+                          or
     -- CHM0007 BEGIN
 		-- (1 = (case when #report_output.GRGR_CK = 28 and #report_output.CLCL_PAID_DT < '2020-01-01' and t.EXPIRATION_ID = 3640 then 1 else 2 end))  --CHM0019
 		--                          or
@@ -738,94 +1023,97 @@ delete from report_output as ro
         -- CHM0007 END
 		--		or
 	-- CHM0024 END
-			 (1 = (case when ro.GRGR_CK NOT IN (3,67) then 1 else 2 end))); -- CH0007D change <> 3 to NOT IN (3,67)  --CHM0007 Add 28 -CHM0024 Remove 28                                              
+			 (1 = (case when #report_output.GRGR_CK NOT IN (3,67) then 1 else 2 end))) -- CH0007D change <> 3 to NOT IN (3,67)  --CHM0007 Add 28 -CHM0024 Remove 28
+                   )
 
+;      
 -- CHM0002 BEGIN
-drop table if exists nj_clms;
+if OBJECT_ID('tempdb..#nj_clms') is not null
+	drop table #nj_clms;
 
-create temporary table nj_clms (ROOT_CLCL_ID char(10), CLCL_ID char(12));
+create table #nj_clms (ROOT_CLCL_ID char(10), CLCL_ID char(12), CLCL_ID_ADJ_FROM char(12), CLCL_TOT_PAYABLE numeric(18,4), PREV_RECOV char(1));
 
-	insert into nj_clms (ROOT_CLCL_ID, CLCL_ID)
-		select ro.ROOT_CLCL_ID, min(clcl.CLCL_ID)
-		from report_output ro
-			inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl on left(ro.CLCL_ID,10) = left(clcl.CLCL_ID,10)
-		where ro.GRGR_CK = 1
-	      and clcl.CLCL_TOT_PAYABLE > 0
-	    group by ro.ROOT_CLCL_ID;
+	insert into #nj_clms (ROOT_CLCL_ID, CLCL_ID, CLCL_ID_ADJ_FROM, CLCL_TOT_PAYABLE, PREV_RECOV)
+		select ro.ROOT_CLCL_ID, clcl.CLCL_ID, clcl.CLCL_ID_ADJ_FROM, clcl.CLCL_TOT_PAYABLE, 'N'
+		from #report_output ro
+			inner join dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) on ro.ROOT_CLCL_ID = clcl.ROOT_CLCL_ID
+		where ro.GRGR_CK = 1;
 
-delete from report_output as ro
-using nj_clms nj
-	inner join P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl on nj.CLCL_ID = clcl.CLCL_ID
-where ro.ROOT_CLCL_ID = nj.ROOT_CLCL_ID
-  and ro.EXPTYPE = 'PAID' 
-  and ro.GRGR_CK = 1
-  and ifnull(ro.RECORD_TYPE,'O') <> 'R' -- Ovp claims only
-  and ro.EXP_DT >= clcl.CLCL_PAID_DT;
+update n1
+	set n1.PREV_RECOV = 'Y'
+from #nj_clms n1
+	inner join #nj_clms n2 on n1.CLCL_ID_ADJ_FROM = n2.CLCL_ID
+						  and n1.CLCL_TOT_PAYABLE < n2.CLCL_TOT_PAYABLE;
 
-drop table if exists nj_clms;
- -- CHM0002 END
- 
+while (select count(*) from #nj_clms n1	inner join #nj_clms n2 on n1.CLCL_ID_ADJ_FROM = n2.CLCL_ID and n1.PREV_RECOV = 'N' and n2.PREV_RECOV = 'Y') > 0
+begin
+	update n1
+	set n1.PREV_RECOV = n2.PREV_RECOV
+	from #nj_clms n1 inner join #nj_clms n2 on n1.CLCL_ID_ADJ_FROM = n2.CLCL_ID and n1.PREV_RECOV = 'N' and n2.PREV_RECOV = 'Y';
+end
+
+update #report_output
+	set PROJ_EXISTS = 'Y'
+from #report_output ro
+    inner join #nj_clms nc on ro.CLCL_ID = nc.CLCL_ID
+						  and nc.PREV_RECOV = 'Y';
+
+with c as (select ROOT_CLCL_ID, min(CLCL_ID) as MIN_CLM from #nj_clms where CLCL_TOT_PAYABLE > 0 group by ROOT_CLCL_ID)
+delete from #report_output
+from #report_output ro inner join c on ro.ROOT_CLCL_ID = c.ROOT_CLCL_ID
+where EXPTYPE = 'PAID' 
+  and GRGR_CK = 1
+  and ISNULL(RECORD_TYPE,'O') <> 'R' -- Ovp claims only
+  and EXP_DT >= (select clcl.CLCL_PAID_DT 
+				   from dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) 
+				  where c.MIN_CLM = clcl.CLCL_ID);
+
+drop table #nj_clms;
+-- CHM0002 END
+
 --CHM0022c BEGIN
-delete from report_output
-where MCTN_ID = '621821201'
-  and CDML_FROM_DT < '2024-01-01'::date;
+delete from #report_output
+where MCTN_ID = 621821201
+  and CDML_FROM_DT < '2024-01-01';
 --CHM0022c END
-delete from report_output as ro
-using P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl 
-where concat(ro.ROOT_CLCL_ID,'00') = clcl.CLCL_ID
-  and ro.EXPTYPE = 'PAID'
-  and ifnull(ro.RECORD_TYPE,'O') <> 'R' -- Ovp claims only
-  -- CHM0021a and ro.GRGR_CK > 1 -- CHM0002
-  and ro.GRGR_CK not in (1,234) --CHM0021a
-  and ro.EXP_DT >=  clcl.CLCL_PAID_DT;
 
+delete 
+ from #report_output
+where EXPTYPE = 'PAID'
+  -- CHM0021a and GRGR_CK > 1 -- CHM0002
+  and GRGR_CK not in (1,234) --CHM0021a
+  and ISNULL(RECORD_TYPE,'O') <> 'R' -- Ovp claims only
+  and EXP_DT >=           
+				(SELECT CLCL2.CLCL_PAID_DT
+				  FROM DW.FAC_CMC_CLCL_CLAIM CLCL2 WITH (NOLOCK)
+				 WHERE LEFT(#REPORT_OUTPUT.CLCL_ID,10)+'00' = CLCL2.CLCL_ID) ;		  
 
+delete 
+ from #report_output
+where EXPTYPE = 'RECD'
+  and ISNULL(RECORD_TYPE,'O') <> 'R' -- Ovp claims only
+  and EXP_DT >=           
+				(SELECT CLCL2.CLCL_RECD_DT 
+				  FROM DW.FAC_CMC_CLCL_CLAIM CLCL2 WITH (NOLOCK)
+				 WHERE LEFT(#REPORT_OUTPUT.CLCL_ID,10)+'00' = CLCL2.CLCL_ID) ; 				  
 
-delete from report_output as ro
-using P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl 
-where concat(ro.ROOT_CLCL_ID,'00') = clcl.CLCL_ID
-  and ro.EXPTYPE = 'RECD'
-  and ifnull(ro.RECORD_TYPE,'O') <> 'R' -- Ovp claims only
-  and ro.EXP_DT >=  clcl.CLCL_RECD_DT;
+delete 
+ from #report_output
+where EXPTYPE = 'DOS'
+  and ISNULL(RECORD_TYPE,'O') <> 'R' -- Ovp claims only
+  and EXP_DT >=           
+				(SELECT CLCL2.CLCL_LOW_SVC_DT 
+				  FROM DW.FAC_CMC_CLCL_CLAIM CLCL2 WITH (NOLOCK)
+				 WHERE LEFT(#REPORT_OUTPUT.CLCL_ID,10)+'00' = CLCL2.CLCL_ID) ; 	     
 
-delete from report_output as ro
-using P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl 
-where concat(ro.ROOT_CLCL_ID,'00') = clcl.CLCL_ID
-  and ro.EXPTYPE = 'DOS'
-  and ifnull(ro.RECORD_TYPE,'O') <> 'R' -- Ovp claims only
-  and ro.EXP_DT >=  clcl.CLCL_LOW_SVC_DT;	     
 -- CH0006B END
 
---CHM0005 BEGIN
-delete from report_output
-where ifnull(RECORD_TYPE,'O') <> 'R'
-  and not(GRGR_CK in (3,34,13,31))
-  and CLCL_TOT_PAYABLE < 25;
+update #report_output
+	set CDSD_NDC_CODE = CDSD.CDSD_NDC_CODE 
+from #report_output INNER JOIN DW.FAC_CMC_CDSD_SUPP_DATA CDSD with (nolock) on CDSD.CLCL_ID = #report_output.CLCL_ID
+	and CDSD.CDML_SEQ_NO = #report_output.CDML_SEQ_NO; --CH34
 
-delete from report_output
-where ifnull(RECORD_TYPE,'O') <> 'R'
-  and GRGR_CK in (3,34,13,31)
-  and CLCL_TOT_PAYABLE < 10;
---CHM0005 END
- 
---CHM0021a BEGIN
-delete from report_output
-where ifnull(RECORD_TYPE,'O') <> 'R'
-  and GRGR_CK = 234
-  and EXP_DT >=  CLCL_PAID_DT;
---CHM0021a END
- 
- --CHM0021b BEGIN
-delete from report_output
-where GRGR_CK = 13
-  and CSCS_ID in ('PL10','PL11','PL12','PL95','PL96','PL97','CD04','CD05','CD06','CD07','CD08','CD09')
-  and concat(CLHP_FAC_TYPE,CLHP_BILL_CLASS) in ('066','089')
-  and CDML_FROM_DT > '2024-06-30'::date;
---CHM0021b END
-
-
-
-update report_output as ro
+update ro
 	set ro.MARKET_NAME = case pdpd.LOBD_ID 
 		when 'AUMC' then 'TXAUS-VANT' when 'AUDL' then 'TXAUS-DSNP'
 		when 'BEMC' then 'TXBEA-VANT' when 'BEDL' then 'TXBEA-DSNP'
@@ -839,32 +1127,70 @@ update report_output as ro
 		when 'RNMC' then 'TXRSN-VANT' when 'RNDL' then 'TXRSN-DSNP'
 		when 'RWMC' then 'TXRSW-VANT' when 'RWDL' then 'TXRSW-DSNP'
 		when 'SAMC' then 'TXSAN-VANT' when 'SADL' then 'TXSAN-DSNP' end
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_PDPD_PRODUCT_CMPCT_ACTV pdpd 
-where ro.PDPD_ID = pdpd.PDPD_ID
-  and ro.MARKET_NAME is null 
-  and ro.PDPD_ID like 'TX%'; 
+from #report_output ro
+	inner join dw.FAC_CMC_PDPD_PRODUCT pdpd on ro.PDPD_ID = pdpd.PDPD_ID
+where ro.MARKET_NAME is null 
+  and ro.PDPD_ID like 'TX%';
 
-update report_output as ro
+--CHM0005 BEGIN
+   delete
+     from #report_output
+       where exists (select 'x'
+                                  from dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) 
+                                    where #report_output.CLCL_ID = clcl.CLCL_ID                                   
+                                      and clcl.CLCL_TOT_PAYABLE < 25)
+      and isnull(#report_output.RECORD_TYPE,'O') = 'O'
+         and not (#report_output.GRGR_CK IN (3,34,13,31));
+                                         
+
+   delete
+     from #report_output
+       where exists (select 'x'
+                                  from dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) 
+                                    where #report_output.CLCL_ID = clcl.CLCL_ID                                   
+                                      and clcl.CLCL_TOT_PAYABLE < 10)
+      and isnull(#report_output.RECORD_TYPE,'O') = 'O'
+         and #report_output.GRGR_CK IN (3,34,13,31);
+--CHM0005 END
+ 
+delete from #report_output 
+where EXPTYPE = 'PAID'
+  and ISNULL(RECORD_TYPE,'O') <> 'R' -- Ovp claims only
+  and GRGR_CK = 234 
+  and EXP_DT >=  CLCL_PAID_DT;
+-- CHM0021a END
+ 
+--CHM0021b BEGIN
+delete from #report_output
+where GRGR_CK = 13
+  and CSCS_ID IN ('PL10', 'PL11', 'PL12', 'PL95', 'PL96', 'PL97', 'CD04', 'CD05', 'CD06', 'CD07', 'CD08', 'CD09')
+  and concat(CLHP_FAC_TYPE,CLHP_BILL_CLASS) in ('066','089')
+  and cdml_from_dt > '2024-06-30';
+--CHM0021b END
+
+
+
+update ro
 set ro.ORIGRECDDATE = clcl.CLCL_RECD_DT,
 	ro.ORIGPAIDDATE = clcl.CLCL_PAID_DT
-from P01_EDL.EDL_RAWZ_CMPCT_ALLPHI.CMC_CLCL_CLAIM_CMPCT_ACTV clcl
-where concat(ro.ROOT_CLCL_ID,'00') = clcl.CLCL_ID;
+from #report_output ro	
+	inner join dw.FAC_CMC_CLCL_CLAIM clcl with (nolock) on ro.ROOT_CLCL_ID+'00' = clcl.CLCL_ID;
 
-DELETE FROM REPORT_OUTPUT
-WHERE ifnull(REPORT_OUTPUT.RECORD_TYPE,'R') = 'R'
-AND NOT EXISTS (SELECT 'x'
-	FROM REPORT_OUTPUT AS RO
-	WHERE REPORT_OUTPUT.GROUP_ID = RO.GROUP_ID
-		AND RO.RECORD_TYPE = 'O'
-);
+DELETE FROM #report_output
+    FROM #report_output 
+	WHERE isnull(#REPORT_OUTPUT.RECORD_TYPE,'O') = 'O'
+	AND NOT EXISTS (SELECT 'X'
+		            FROM #report_output ro
+		            WHERE #report_output.GROUP_ID = RO.GROUP_ID
+		                AND RO.RECORD_TYPE = 'R');
 
-DELETE FROM REPORT_OUTPUT
-WHERE ifnull(REPORT_OUTPUT.RECORD_TYPE,'O') = 'O'
-AND NOT EXISTS (SELECT 'x'
-	FROM REPORT_OUTPUT AS RO
-	WHERE REPORT_OUTPUT.GROUP_ID = RO.GROUP_ID
-		AND RO.RECORD_TYPE = 'R'
-);
+DELETE FROM #report_output
+    FROM #report_output 
+	WHERE isnull(#REPORT_OUTPUT.RECORD_TYPE,'R') = 'R'
+	AND NOT EXISTS (SELECT 'X'
+		            FROM #report_output ro
+		            WHERE #report_output.GROUP_ID = RO.GROUP_ID
+		                AND RO.RECORD_TYPE = 'O');
 
 /****************************************************************************************************/
 /* Output data.																						*/
@@ -876,7 +1202,7 @@ select MARKET_NAME,
 	   GRGR_CK											as GRP_ID,
 	   SESE_DESC,
 	   SEPC_DESC, 
-       concat(CLHP_FAC_TYPE,CLHP_BILL_CLASS,CLHP_FREQUENCY) as BILL_TYPE,
+       CLHP_FAC_TYPE + CLHP_BILL_CLASS + CLHP_FREQUENCY as BILL_TYPE,
        CDML_POS_IND										as INPAT_OUTPAT_IND,
        CLHP_DC_STAT										as DISCH_STATUS,
        CLHP_ADM_TYP										as ADMIT_SOURCE,
@@ -898,10 +1224,10 @@ select MARKET_NAME,
 	   CDML_CAP_IND										as CAPITATED_IND,
 	   MEME_CK											as MEMBER_KEY,
 	   SBSB_ID											as AGP_MEMB_NBR,
-	   concat(MEME_LAST_NAME,',',MEME_FIRST_NAME)		as FULL_NAME,
+	   MEME_LAST_NAME + ',' + MEME_FIRST_NAME			as FULL_NAME,
 	   CLCL_ME_AGE										as MEMBER_AGE,
-	   to_varchar(CDML_FROM_DT::date,'YYYY/MM/DD')		as FROM_DT,
-	   to_varchar(CDML_TO_DT::date,'YYYY/MM/DD')		as TO_DT,	   
+	   CONVERT(varchar(10),CDML_FROM_DT,101)			as FROM_DT,
+	   CONVERT(varchar(10),CDML_TO_DT,101)				as TO_DT,
 	   IDCD_ID			                                as DIAG,
 	   IDCD_DESC									    as IDCD_DESC,
 	   RCRC_ID											as REV_CODE,
@@ -912,19 +1238,20 @@ select MARKET_NAME,
 	   SUBSTRING(IPCD_ID,6,2)							as MOD1,
 	   CDML_IPCD_MOD2									as MOD2,
 	   CDML_UNITS										as UNITS,
+	   CDSD_NDC_CODE,
 	   CDML_UNITS_ALLOW									as UNITS_ALLOWED,
-	   to_varchar(CLCL_RECD_DT::date,'YYYY/MM/DD')		as CLCL_RECD_DT,
-	   to_varchar(CLCL_PAID_DT::date,'YYYY/MM/DD')		as PAID_DT,
+	   CONVERT(varchar(10),CLCL_RECD_DT,101)			as CLCL_RECD_DT,
+	   CONVERT(varchar(10),CLCL_PAID_DT,101)			as PAID_DT,
 	   CDML_CONSIDER_CHG								as AMT_CHG,
 	   CDML_PR_PYMT_AMT									as AMT_PAY,
 	   (CASE
-			WHEN SEPC_DESC LIKE '%NetworX%' THEN CDNP_RATE
+			WHEN SEPC_DESC LIKE '%NetworX%' THEN CDNP_RATE -- jcb 01/28/2013 removed per Rachelle email .. take out *100
 			ELSE IPRS_RATE
 		END)                                            as FEE_SCH_RATE,
 	   CDNP_BASED_ON									as FEE_SCHEDULE,
 	   SEIP_PFX,
-	   to_varchar(IPRS_EFF_DT::date,'YYYY/MM/DD')		as IPRS_EFF_DT,
-	   to_varchar(IPRS_TERM_DT::date,'YYYY/MM/DD')		as IPRS_TERM_DT,
+	   CONVERT(varchar(10),IPRS_EFF_DT,101)				as IPRS_EFF_DT,
+	   CONVERT(varchar(10),IPRS_TERM_DT,101)			as IPRS_TERM_DT,
 	   IPRS_RATE,
 	   IPRS_DISC_PCT,
 	   CLCL_CUR_STS										as CLM_STS,
@@ -932,19 +1259,20 @@ select MARKET_NAME,
 	   EXCD_SHORT_TEXT									as EXPLAIN_CD_DESC,
 	   GROUP_ID,
 	   RECORD_TYPE,
-	   to_varchar($QueryRunTime::date,'YYYY/MM/DD')		as QRY_RUN_DATE,
-	   $PicmId											as PICM_ID,
-	   $LeadId											as LEAD_ID,
-	   to_varchar(ORIGRECDDATE::date,'YYYY/MM/DD')		as ORIGRECDDATE,
-	   to_varchar(ORIGPAIDDATE::date,'YYYY/MM/DD')		as ORIGPAIDDATE,
-	   CLMF_ICD_IND_PROC								as ICD_IND,
-	   EXPTYPE, 
-	   to_varchar(EXP_DT::date,'YYYY/MM/DD')			as EXP_DT,		-- CH0006B	   
-	   CDML_RISK_WH_AMT									as WITHHOLD_AMT, 
-	   PROJ_EXISTS,														-- CH0008B
-	   ACR_PAYEE_ID										as FCS_PAYEE_ID, -- CH0008C
-	   CDML_COINS_AMT, CDML_COPAY_AMT, CDML_DED_AMT, -- CH01
-	   PRPR_NPI
-	   
-from report_output
-order by MARKET_NAME, GROUP_ID, RECORD_TYPE, CLCL_ID, CDML_SEQ_NO;
+	   CONVERT(varchar(10),@QueryRunTime,101)			as QRY_RUN_DATE,
+	   @ActivityId										as ACTIVITY_ID,
+	   ORIGRECDDATE,
+	   ORIGPAIDDATE,
+	     CLMF_ICD_IND_PROC AS ICD_IND -- CH25
+	     , EXPTYPE, CONVERT(varchar(10),EXP_DT,101)			    as EXP_DT -- CH0006B
+	     ,CDML_RISK_WH_AMT AS WITHHOLD_AMT, PROJ_EXISTS -- CH0008B
+	     ,ACR_PAYEE_ID AS FCS_PAYEE_ID -- CH0008C
+		 ,CDML_ALLOW --CH35
+		 ,CDML_IPCD_MOD3									as MOD3 --CH35
+		 ,CDML_IPCD_MOD4									as MOD4 --CH35
+
+from #report_output
+order by MARKET_NAME, GROUP_ID, RECORD_TYPE, CLCL_ID, CDML_SEQ_NO;			   
+
+drop table #exclude_disall_excd;
+drop table #report_output;
